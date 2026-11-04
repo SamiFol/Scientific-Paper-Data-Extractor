@@ -1,0 +1,57 @@
+{
+  "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+  "authors": [
+    "Jason Wei",
+    "Xuezhi Wang",
+    "Dale Schuurmans",
+    "Maarten Bosma",
+    "Brian Ichter",
+    "Fei Xia",
+    "Ed H. Chi",
+    "Quoc V. Le",
+    "Denny Zhou"
+  ],
+  "year": "2022",
+  "venue": "Advances in Neural Information Processing Systems (NeurIPS)",
+  "problem": "Large language models often struggle with complex reasoning tasks such as arithmetic, commonsense, and symbolic reasoning.",
+  "method": "Chain-of-thought prompting, where few-shot exemplars include intermediate natural language reasoning steps leading to the final answer.",
+  "datasets": [
+    "GSM8K",
+    "SVAMP",
+    "ASDiv",
+    "AQuA",
+    "MAWPS",
+    "CSQA",
+    "StrategyQA",
+    "Date Understanding",
+    "Sports Understanding",
+    "SayCan",
+    "Last Letter Concatenation",
+    "Coin Flip"
+  ],
+  "key_results": [
+    "Chain-of-thought prompting significantly improves reasoning performance across arithmetic, commonsense, and symbolic tasks in large language models.",
+    "Prompting PaLM 540B with eight chain-of-thought exemplars achieves state-of-the-art accuracy on GSM8K, surpassing finetuned GPT-3 with a verifier."
+  ],
+  "limitations": [
+    "Emulating human thought processes does not prove the neural network is actually reasoning.",
+    "Chain-of-thought reasoning only emerges at large model scales (typically around 100B parameters).",
+    "There is no guarantee of correct reasoning paths, which can lead to incorrect answers."
+  ],
+  "future_work": [
+    "Improve factual generations of language models.",
+    "Explore how to induce reasoning capabilities in smaller models.",
+    "Evaluate chain-of-thought prompting on more diverse tasks such as machine translation."
+  ],
+  "key_claims": [
+    "Chain-of-thought prompting elicits complex reasoning abilities in large language models without requiring finetuning.",
+    "Chain-of-thought reasoning is an emergent ability of model scale, appearing mostly in models with roughly 100B or more parameters.",
+    "Chain-of-thought prompting facilitates out-of-domain length generalization for symbolic reasoning tasks."
+  ],
+  "references_cited": [
+    "Brown et al., 2020",
+    "Cobbe et al., 2021",
+    "Ling et al., 2017"
+  ],
+  "source_file": "2201.11903v6.pdf"
+}

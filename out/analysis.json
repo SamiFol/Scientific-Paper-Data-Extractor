@@ -1,0 +1,109 @@
+{
+  "themes": [
+    {
+      "theme": "Arhitecturi Fundamentale și Atenție",
+      "papers": [
+        "1706.03762v7.pdf"
+      ]
+    },
+    {
+      "theme": "Raționament prin Prompting (Chain-of-Thought)",
+      "papers": [
+        "2201.11903v6.pdf",
+        "2210.03629v3.pdf"
+      ]
+    },
+    {
+      "theme": "Interacțiunea cu Mediul și Utilizarea Uneltelor",
+      "papers": [
+        "2210.03629v3.pdf",
+        "2302.04761v1.pdf"
+      ]
+    },
+    {
+      "theme": "Agenți Generativi și Simulare Socială",
+      "papers": [
+        "2304.03442v2.pdf"
+      ]
+    }
+  ],
+  "comparison": {
+    "methods": {
+      "Transformer": "Mecanism de self-attention pur, eliminând recurența (1706.03762v7.pdf).",
+      "Chain-of-Thought": "Prompting few-shot cu pași intermediari de raționament (2201.11903v6.pdf).",
+      "ReAct": "Intercalarea urmelor de raționament verbal cu acțiuni specifice sarcinii (2210.03629v3.pdf).",
+      "Toolformer": "Finetuning auto-supravegheat pentru utilizarea API-urilor bazat pe reducerea perplexității (2302.04761v1.pdf).",
+      "Generative Agents": "Arhitectură cu flux de memorie, reflexie și planificare ierarhică (2304.03442v2.pdf)."
+    },
+    "results": {
+      "Performanță SOTA": "Transformer a stabilit noi standarde în traducere (1706.03762v7.pdf); PaLM 540B cu CoT a depășit GPT-3 finetunat pe GSM8K (2201.11903v6.pdf).",
+      "Eficiență": "Toolformer depășește modele mult mai mari (GPT-3, OPT) prin utilizarea uneltelor (2302.04761v1.pdf).",
+      "Credibilitate": "Agenții generativi au obținut scoruri de credibilitate mai mari decât evaluările umane în simulări (2304.03442v2.pdf).",
+      "Reducerea erorilor": "ReAct reduce halucinațiile și propagarea erorilor față de CoT (2210.03629v3.pdf)."
+    }
+  },
+  "gaps": [
+    "Incapacitatea modelelor actuale de a utiliza unelte în lanț (chaining) sau în mod interactiv (2302.04761v1.pdf).",
+    "Raționamentul complex (CoT) apare doar la scări mari ale modelelor, peste 100B parametri (2201.11903v6.pdf).",
+    "Dificultatea de a învăța în spații de limbaj nelimitate fără priorități lingvistice puternice (2210.03629v3.pdf).",
+    "Provocări în gestionarea fluxurilor masive de memorie și halucinații în recuperarea informațiilor (2304.03442v2.pdf).",
+    "Costuri computaționale ridicate și latență pentru interacțiuni în timp real (2304.03442v2.pdf)."
+  ],
+  "contradictions": [
+    "CoT (2201.11903v6.pdf) se bazează pe raționament intern care poate genera erori, în timp ce ReAct (2210.03629v3.pdf) susține că interacțiunea cu mediul extern este necesară pentru a corecta aceste halucinații.",
+    "Toolformer (2302.04761v1.pdf) propune învățarea auto-supravegheată a uneltelor, spre deosebire de ReAct (2210.03629v3.pdf) care utilizează prompting-ul pentru a ghida acțiunile."
+  ],
+  "proposed_contribution": "Dezvoltarea unui cadru de agenți autonomi care combină arhitectura de memorie și reflexie (2304.03442v2.pdf) cu abilitatea de auto-învățare a uneltelor (2302.04761v1.pdf) pentru a permite utilizarea interactivă și în lanț a API-urilor, reducând în același timp halucinațiile prin grounding extern (2210.03629v3.pdf).",
+  "outline": [
+    {
+      "section": "Introducere în Arhitecturile Bazate pe Atenție",
+      "key_points": [
+        "Trecerea de la RNN/CNN la Transformer",
+        "Eficiența paralelizării și self-attention"
+      ],
+      "cited_papers": [
+        "1706.03762v7.pdf"
+      ]
+    },
+    {
+      "section": "Elicitarea Raționamentului în Modele Mari de Limbaj",
+      "key_points": [
+        "Chain-of-Thought ca abilitate emergentă a scalei",
+        "Limitările raționamentului pur intern"
+      ],
+      "cited_papers": [
+        "2201.11903v6.pdf"
+      ]
+    },
+    {
+      "section": "Sinergia dintre Raționament și Acțiune",
+      "key_points": [
+        "Paradigma ReAct pentru interacțiunea cu mediul",
+        "Reducerea halucinațiilor prin feedback extern"
+      ],
+      "cited_papers": [
+        "2210.03629v3.pdf"
+      ]
+    },
+    {
+      "section": "Integrarea Auto-supravegheată a Uneltelor",
+      "key_points": [
+        "Toolformer și învățarea autonomă a API-urilor",
+        "Depășirea modelelor mari prin competențe externe"
+      ],
+      "cited_papers": [
+        "2302.04761v1.pdf"
+      ]
+    },
+    {
+      "section": "Arhitecturi pentru Agenți Sociali Complecși",
+      "key_points": [
+        "Gestiunea memoriei pe termen lung și reflexia",
+        "Simularea comportamentului uman credibil"
+      ],
+      "cited_papers": [
+        "2304.03442v2.pdf"
+      ]
+    }
+  ]
+}

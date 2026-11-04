@@ -1,0 +1,38 @@
+{
+  "title": "Attention Is All You Need",
+  "authors": [
+    "Ashish Vaswani",
+    "Noam Shazeer",
+    "Niki Parmar",
+    "Jakob Uszkoreit",
+    "Llion Jones",
+    "Aidan N. Gomez",
+    "Łukasz Kaiser",
+    "Illia Polosukhin"
+  ],
+  "year": "2017",
+  "venue": "31st Conference on Neural Information Processing Systems (NIPS 2017)",
+  "problem": "Sequence transduction tasks, specifically machine translation and English constituency parsing.",
+  "method": "The Transformer, a model architecture based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+  "datasets": [
+    "WMT 2014 English-to-German",
+    "WMT 2014 English-to-French",
+    "Wall Street Journal (WSJ) portion of the Penn Treebank"
+  ],
+  "key_results": "Achieved 28.4 BLEU on WMT 2014 English-to-German (improving by over 2 BLEU) and 41.8 BLEU on WMT 2014 English-to-French, establishing a new state-of-the-art with significantly lower training costs.",
+  "limitations": "Reduced effective resolution due to averaging attention-weighted positions; requires task-specific tuning for some applications.",
+  "future_work": "Extend the Transformer to other modalities (images, audio, video); investigate local, restricted attention mechanisms for large inputs.",
+  "key_claims": [
+    "The Transformer is the first transduction model relying entirely on self-attention.",
+    "The model is more parallelizable and requires significantly less time to train than RNN or CNN-based models.",
+    "The Transformer generalizes well to other tasks like English constituency parsing."
+  ],
+  "references_cited": [
+    "Vaswani et al. (2017)",
+    "Bahdanau et al. (2014)",
+    "Sutskever et al. (2014)",
+    "Hochreiter & Schmidhuber (1997)",
+    "Kingma & Ba (2015)"
+  ],
+  "source_file": "1706.03762v7.pdf"
+}

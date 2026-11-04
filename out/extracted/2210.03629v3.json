@@ -1,0 +1,39 @@
+{
+  "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+  "authors": [
+    "Shunyu Yao",
+    "Jeffrey Zhao",
+    "Dian Yu",
+    "Nan Du",
+    "Izhak Shafran",
+    "Karthik Narasimhan",
+    "Yuan Cao"
+  ],
+  "year": 2023,
+  "venue": "ICLR 2023",
+  "problem": "Large language models study reasoning (e.g., chain-of-thought) and acting (action plan generation) separately, which limits their ability to interact with environments, handle exceptions, update plans, or avoid hallucination and error propagation.",
+  "method": "ReAct, a prompt-based paradigm that interleaves verbal reasoning traces (thoughts) and task-specific actions, allowing the model to perform dynamic reasoning and interface with external environments (e.g., Wikipedia API, web navigation, text-based games).",
+  "datasets": [
+    "HotpotQA",
+    "Fever",
+    "ALFWorld",
+    "WebShop"
+  ],
+  "key_results": "ReAct outperforms acting-only and reasoning-only baselines on diverse language and decision-making tasks, improving absolute success rates by 34% on ALFWorld and 10% on WebShop compared to imitation/reinforcement learning methods, while reducing hallucinations.",
+  "limitations": "The unlimited language space makes learning difficult without strong language priors; interleaving reasoning and action can reduce flexibility and cause repetitive loops under greedy decoding.",
+  "future_work": "Scaling up ReAct with multi-task training, combining with reinforcement learning, and exploring better decoding strategies like beam search.",
+  "key_claims": [
+    "Interleaving reasoning and acting allows greater synergy, where reasoning helps track and update plans and actions gather external information.",
+    "ReAct overcomes prevalent issues of hallucination and error propagation found in chain-of-thought reasoning.",
+    "ReAct significantly outperforms existing imitation and reinforcement learning baselines on interactive decision-making benchmarks with minimal in-context examples.",
+    "Combining reasoning and acting provides better model interpretability, trustworthiness, and diagnosability."
+  ],
+  "references_cited": [
+    "Wei et al., 2022",
+    "Shridhar et al., 2020b",
+    "Yao et al., 2022",
+    "Yang et al., 2018",
+    "Thorne et al., 2018"
+  ],
+  "source_file": "2210.03629v3.pdf"
+}

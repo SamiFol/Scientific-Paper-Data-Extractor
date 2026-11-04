@@ -1,19 +1,38 @@
+"""Setari comune: modele, foldere, cheie API."""
 import os
+from pathlib import Path
+
 from dotenv import load_dotenv
-from crewai import LLM
 
-load_dotenv()
+load_dotenv()  # citeste .env din folderul curent
 
-api_key = os.getenv("GEMINI_API_KEY")
-if not api_key:
-    raise ValueError("GEMINI_API_KEY nu a fost găsită în .env!")
+# --- API ---
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+if not GEMINI_API_KEY:
+    raise SystemExit("Lipseste GEMINI_API_KEY. Creeaza fisierul .env (vezi .env.example).")
 
-os.environ["GEMINI_API_KEY"] = api_key
+# --- Modele (pot fi suprascrise din .env) ---
+MODEL_FAST = os.getenv("MODEL_FAST", "gemini-3.1-flash-lite")      # extractie din PDF-uri
+MODEL_SMART = os.getenv("MODEL_SMART", "gemini-3-flash-preview")   # analiza + scriere
 
-gemini_llm = LLM(
-    model="gemini/gemini-3.8-flash",
-    api_key=api_key,
-    temperature=0.4,
-    max_retries=10,       # Reîncearcă automat de 10 ori dacă serverul e aglomerat
-    request_timeout=120   # Așteaptă până la 2 minute pentru răspuns
-)
+# Daca un model da eroare (404/503), llm.py incearca urmatoarele, in ordine.
+FALLBACK_MODELS = [
+    m.strip()
+    for m in os.getenv(
+        "FALLBACK_MODELS",
+        "gemini-3.1-flash-lite,gemini-3-flash-preview,gemini-flash-lite-latest",
+    ).split(",")
+    if m.strip()
+]
+
+# --- Rate limiting ---
+PAUSE_SECONDS = float(os.getenv("PAUSE_SECONDS", "4"))  # mareste daca primesti 429
+
+# --- Foldere si fisiere ---
+PAPERS_DIR = Path("papers")
+OUT_DIR = Path("out")
+EXTRACTED_DIR = OUT_DIR / "extracted"
+ANALYSIS_FILE = OUT_DIR / "analysis.json"
+DRAFT_FILE = OUT_DIR / "paper_draft.md"
+
+EXTRACTED_DIR.mkdir(parents=True, exist_ok=True)

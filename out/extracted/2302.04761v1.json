@@ -1,0 +1,58 @@
+{
+  "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+  "authors": [
+    "Timo Schick",
+    "Jane Dwivedi-Yu",
+    "Roberto Dessì",
+    "Roberta Raileanu",
+    "Maria Lomeli",
+    "Luke Zettlemoyer",
+    "Nicola Cancedda",
+    "Thomas Scialom"
+  ],
+  "year": "2023",
+  "venue": "arXiv:2302.04761v1 [cs.CL]",
+  "problem": "Large language models struggle with basic functionality like arithmetic, factual lookup, and temporal awareness, and existing tool-use approaches rely on large amounts of human annotation or are task-specific.",
+  "method": "Toolformer, a language model finetuned in a self-supervised way to decide when and how to use external tools (calculator, Q&A, search engine, translation, calendar) by filtering API calls based on whether they reduce perplexity on future tokens.",
+  "datasets": [
+    "CCNet",
+    "LAMA",
+    "ASDiv",
+    "SVAMP",
+    "MAWPS",
+    "Web Questions",
+    "Natural Questions",
+    "TriviaQA",
+    "MLQA",
+    "TEMPLAMA",
+    "DATESET",
+    "WikiText"
+  ],
+  "key_results": "Toolformer achieves substantially improved zero-shot performance across various downstream tasks, often outperforming much larger models like GPT-3 (175B) and OPT (66B), without sacrificing core language modeling abilities.",
+  "limitations": [
+    "Inability to use tools in a chain",
+    "Lack of interactive tool use (e.g., refining search queries)",
+    "Sensitivity to input wording",
+    "Sample-inefficiency",
+    "Does not account for computational cost of API calls"
+  ],
+  "future_work": [
+    "Adding interactive functionality to tools",
+    "Iteratively applying the approach (bootstrapping)",
+    "Considering computational cost in API call decisions"
+  ],
+  "key_claims": [
+    "Language models can teach themselves to use external tools in a self-supervised way.",
+    "Toolformer does not require large amounts of human annotations.",
+    "Toolformer improves zero-shot performance on downstream tasks without losing generality.",
+    "Toolformer outperforms significantly larger models on several benchmarks."
+  ],
+  "references_cited": [
+    "Brown et al. (2020)",
+    "Schick and Schütze (2021b)",
+    "Wang and Komatsuzaki (2021)",
+    "Izacard et al. (2022)",
+    "Petroni et al. (2019)"
+  ],
+  "source_file": "2302.04761v1.pdf"
+}
