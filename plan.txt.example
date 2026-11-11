@@ -1,0 +1,6 @@
+# Copy to plan.txt. Passed VERBATIM to analyst and writer; numbers here may be used in the paper.
+# Write only what YOU decided (not results). Examples:
+Benchmark: HotpotQA distractor, 500 dev questions, 3 seeds
+Conditions: react, react_mem, react_mem_noreflect, react_mem_recency
+Max steps per question: 8
+Compute budget: ~36,000 LLM calls

@@ -53,3 +53,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+# Tests and experiment outputs
+.pytest_cache/
+experiment/runs/

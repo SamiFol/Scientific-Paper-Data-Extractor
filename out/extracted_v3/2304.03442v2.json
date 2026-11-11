@@ -11,120 +11,130 @@
   "year": 2023,
   "venue": "UIST '23",
   "arxiv_id": "2304.03442",
-  "abstract_summary": "This paper introduces 'generative agents', computational software agents that simulate believable human behavior. The authors propose an architecture that extends large language models to store a complete record of an agent's experiences in natural language. This memory is synthesized over time into higher-level reflections and retrieved dynamically to inform behavior. The architecture is instantiated in a sandbox environment inspired by The Sims, populated by twenty-five agents. Evaluations demonstrate that these agents produce believable individual and emergent social behaviors, such as autonomously spreading invitations to a party. The work highlights the potential for these agents in interactive applications while discussing ethical risks.",
-  "problem_and_motivation": "The core problem is the lack of computational agents capable of simulating long-term, coherent human behavior in open-world environments. While large language models (LLMs) can simulate human behavior at a single point in time, they struggle with long-term coherence because they lack mechanisms to manage growing memories, reflect on past experiences, and apply those insights to future actions. Existing approaches, such as rule-based systems or reinforcement learning, are either too rigid or limited to adversarial games with well-defined rewards. The authors aim to bridge this gap by creating agents that can remember, retrieve, reflect, and plan, thereby enabling more believable, persistent, and socially dynamic simulations.",
+  "abstract_summary": "This paper introduces generative agents, which are computational software agents that simulate believable human behavior. These agents can perform daily routines, form opinions, notice others, and initiate conversations. The authors describe an architecture that extends a large language model to store a comprehensive record of experiences in natural language, synthesize these memories into higher-level reflections, and retrieve them to plan behavior. The agents are instantiated in a sandbox environment inspired by The Sims, where 25 agents interact autonomously. Evaluations demonstrate that these agents produce believable individual and emergent social behaviors, such as spreading information and coordinating group activities. The paper also discusses the ethical implications and potential applications of this technology.",
+  "problem_and_motivation": "The core problem is creating computational agents that can act as believable proxies for human behavior in open-world, interactive environments. While large language models have shown promise in simulating behavior at single time points, they struggle with long-term coherence and managing the vast, evolving history of interactions required for believable social dynamics. Existing approaches often rely on manually authored rules or limited reinforcement learning, which are either too rigid or lack the flexibility to handle complex, open-ended social scenarios. The motivation is to enable applications like social prototyping, training for interpersonal communication, and immersive virtual worlds where agents can remember past experiences, reflect on them, and adapt their behavior accordingly.",
   "contributions": [
-    "Introduction of generative agents: believable simulacra of human behavior conditioned on dynamic experiences.",
-    "A novel agent architecture that enables agents to remember, retrieve, reflect, and plan through evolving circumstances.",
-    "Two evaluations (controlled and end-to-end) establishing the causal importance of the architecture's components.",
-    "Discussion of ethical and societal risks, including parasocial relationships, deepfakes, and over-reliance on AI in design processes."
+    "Generative agents: believable simulacra of human behavior conditioned on changing experiences and environments.",
+    "A novel architecture that enables agents to remember, retrieve, reflect, interact, and plan through dynamically evolving circumstances.",
+    "Two evaluations (controlled and end-to-end) establishing the causal importance of the architecture's components and identifying failure modes.",
+    "Discussion of ethical and societal risks, including parasocial relationships, deepfakes, and the need for human-in-the-loop design."
   ],
   "method": {
-    "overview": "The architecture combines a large language model (ChatGPT) with three core components: a memory stream, reflection, and planning. The memory stream acts as a long-term database of all agent experiences. The reflection mechanism periodically synthesizes these experiences into higher-level inferences. The planning mechanism translates these inferences and the current environment into actionable, long-term plans. These components are recursively fed back into the memory stream to influence future behavior.",
+    "overview": "The generative agent architecture combines a large language model with three core components: memory, reflection, and planning. The memory stream maintains a comprehensive, time-stamped record of all agent experiences. The retrieval function selects the most relevant memories based on recency, importance, and relevance to the current situation. The reflection component periodically synthesizes these memories into higher-level inferences, which are added back to the memory stream. The planning component translates these reflections and the current context into high-level action plans, which are then recursively decomposed into detailed behaviors. This architecture allows agents to maintain long-term coherence while reacting dynamically to their environment.",
     "components": [
       {
         "name": "Memory Stream",
-        "description": "A database that maintains a comprehensive record of an agent's experiences in natural language. It consists of 'observations' (events directly perceived). A retrieval function surfaces relevant memories based on a weighted combination of recency, importance, and relevance. Recency uses an exponential decay function; importance is generated by the LLM; relevance is calculated via cosine similarity of embedding vectors.",
+        "description": "A database that maintains a comprehensive record of an agent's experiences. Each memory object contains a natural language description, a creation timestamp, and a most recent access timestamp. It includes observations, reflections, and plans.",
         "equations_or_algorithms": "score = alpha_recency * recency + alpha_importance * importance + alpha_relevance * relevance"
       },
       {
         "name": "Reflection",
-        "description": "A mechanism that synthesizes raw observations into higher-level, abstract thoughts. Periodically, when the sum of importance scores of recent events exceeds a threshold, the agent identifies salient questions about its experiences. It then queries the memory stream for relevant records and uses the LLM to generate insights, which are stored as new reflections in the memory stream.",
+        "description": "A mechanism that synthesizes memories into higher-level, more abstract thoughts. Reflections are generated periodically when the sum of importance scores of recent events exceeds a threshold. The agent identifies salient questions from recent memories, retrieves relevant records, and uses the language model to extract insights, which are then stored as new memory objects.",
         "equations_or_algorithms": null
       },
       {
         "name": "Planning",
-        "description": "A top-down process that translates an agent's goals and background into a sequence of actions. It starts with a broad daily plan, which is then recursively decomposed into hour-long chunks and further into 5-15 minute granular actions. Plans are stored in the memory stream and can be updated or re-planned if the agent perceives new, relevant information.",
+        "description": "A mechanism that translates conclusions and current environment into high-level action plans, which are then recursively decomposed into detailed behaviors. Plans are stored in the memory stream and can be updated or changed midstream if the agent's situation changes.",
         "equations_or_algorithms": null
       }
     ],
-    "settings": "Implementation uses gpt-3.5-turbo (ChatGPT). The sandbox environment is built using the Phaser web game framework. The simulation involved 25 agents over two game days."
+    "settings": "The implementation uses the gpt-3.5-turbo version of ChatGPT. The sandbox environment is built using the Phaser web game development framework. The memory decay factor for recency is 0.995. Reflection threshold is 150."
   },
   "experiments": {
     "tasks_and_datasets": [
       {
         "name": "Controlled Evaluation (Interview)",
-        "description": "Agents were interviewed across five categories (self-knowledge, memory, plans, reactions, reflections) to assess their ability to maintain character and coherence.",
+        "description": "Agents were interviewed with 25 questions across five categories (self-knowledge, memory, planning, reactions, reflections) to probe their capabilities.",
         "metric": "Believability (TrueSkill rating)"
       },
       {
         "name": "End-to-End Evaluation",
-        "description": "A two-day simulation of 25 agents in Smallville to observe emergent social behaviors (information diffusion, relationship formation, coordination).",
-        "metric": "Percentage of agents with information, network density, successful coordination (party attendance)"
+        "description": "25 agents interacted in the Smallville sandbox for two full game days to observe emergent social behaviors.",
+        "metric": "Information diffusion (percentage of agents knowing specific info), relationship formation (network density), and coordination (party attendance)."
       }
     ],
     "baselines": [
-      "No observation, no reflection, no planning (fully ablated)",
-      "No reflection, no planning (access to observations only)",
-      "No reflection (access to observations and plans)",
+      "No observation, no reflection, no planning (previous state of the art)",
+      "No reflection, no planning",
+      "No reflection",
       "Human crowdworker-authored behavior"
     ],
-    "setup_details": "100 human evaluators recruited from Prolific. Within-subjects design where evaluators ranked the believability of responses from different architectures. TrueSkill used to convert ranks to interval data."
+    "setup_details": "100 participants evaluated the believability of agent responses in a within-subjects design. TrueSkill was used to calculate mean rating values and standard deviations for each condition."
   },
   "results": [
     {
-      "experiment": "Controlled Evaluation (Believability)",
-      "comparison": "Full architecture vs. ablated versions vs. human baseline",
-      "numbers": "Full architecture: 29.89; No reflection: 26.88; No reflection/planning: 25.64; Human: 22.95; Fully ablated: 21.21",
+      "experiment": "Controlled Evaluation (Interview)",
+      "comparison": "Full architecture vs. ablated architectures vs. human crowdworker",
+      "numbers": "Full Architecture (mu=29.89, sigma=0.72), No Reflection (mu=26.88, sigma=0.69), No Reflection/Planning (mu=25.64, sigma=0.68), Human Crowdworker (mu=22.95, sigma=0.69), No Memory/Planning/Reflection (mu=21.21, sigma=0.70)",
       "model_size": null,
-      "setting": "Interview-based evaluation",
-      "where": "Figure 8, Page 14",
-      "takeaway": "The full architecture significantly outperforms all ablated conditions and the human baseline."
+      "setting": "Interview",
+      "where": "Page 14, Figure 8",
+      "takeaway": "The full architecture produced the most believable behavior, with performance degrading as components were removed."
     },
     {
-      "experiment": "End-to-End Evaluation (Information Diffusion)",
+      "experiment": "End-to-End Evaluation",
       "comparison": "Start of simulation vs. end of simulation",
-      "numbers": "Mayoral candidacy knowledge: 4% to 32%; Party invitation knowledge: 4% to 52%",
+      "numbers": "Sam's candidacy knowledge: 4% to 32%; Party knowledge: 4% to 52%; Network density: 0.167 to 0.74",
       "model_size": null,
       "setting": "Two-day simulation",
-      "where": "Section 7.1.2, Page 16",
-      "takeaway": "Agents successfully spread information autonomously."
+      "where": "Page 16",
+      "takeaway": "Agents demonstrated emergent social behaviors including information diffusion, relationship formation, and coordination."
     }
   ],
   "claims_table": [
     {
-      "claim": "Full architecture produces more believable behavior than ablated versions.",
-      "metric": "TrueSkill rating",
+      "claim": "Full architecture produces the most believable behavior.",
+      "metric": "TrueSkill Rating",
       "value": "29.89",
-      "benchmark": "Controlled Evaluation",
+      "benchmark": "Interview",
       "model_size": null,
-      "setting": "Interview",
-      "where": "Figure 8"
+      "setting": "Full architecture",
+      "where": "Page 14, Figure 8"
+    },
+    {
+      "claim": "Removing components degrades performance.",
+      "metric": "TrueSkill Rating",
+      "value": "26.88",
+      "benchmark": "Interview",
+      "model_size": null,
+      "setting": "No reflection",
+      "where": "Page 14, Figure 8"
     }
   ],
   "ablations_and_analysis": [
     {
-      "what_varied": "Access to memory, reflection, and planning",
-      "finding": "Each component contributes critically to believability; removing them degrades performance.",
-      "numbers": "Full (29.89) > No Reflection (26.88) > No Reflection/Planning (25.64) > Fully Ablated (21.21)"
+      "what_varied": "Memory components (observation, reflection, planning)",
+      "finding": "Each component contributes critically to the believability of agent behavior.",
+      "numbers": "Full (29.89) > No Reflection (26.88) > No Reflection/Planning (25.64) > No Memory/Planning/Reflection (21.21)"
     }
   ],
   "limitations": [
-    "Synthesizing large memory sets poses challenges for retrieval and action selection.",
-    "Agents may choose less typical locations as they learn about more places.",
-    "Misclassification of physical norms (e.g., bathroom occupancy, store hours).",
-    "Instruction tuning can lead to overly formal or overly cooperative behavior.",
-    "High computational cost (thousands of dollars in tokens for a 2-day simulation).",
-    "Potential for hallucination or memory embellishment.",
-    "Vulnerability to prompt hacking and memory hacking."
+    "Agents can fail to retrieve relevant instances from memory.",
+    "Agents may retrieve incomplete memory fragments.",
+    "Agents may hallucinate embellishments to their knowledge.",
+    "Agents may inherit overly formal speech or behavior from the language model.",
+    "Agents may struggle to classify proper behavior in specific locations (e.g., dorm bathrooms, closed stores).",
+    "Agents may exhibit biased behavior or stereotypes inherited from the underlying language model.",
+    "The simulation is computationally expensive and time-consuming.",
+    "The evaluation was limited to a relatively short timescale."
   ],
   "failure_modes": [
     "Failure to retrieve relevant memories.",
     "Fabricated embellishments to memory.",
-    "Inheriting overly formal speech from the LLM.",
-    "Erratic behavior due to misinterpreting physical environment norms."
+    "Erratic behavior due to misclassification of location norms.",
+    "Overly cooperative behavior due to instruction tuning."
   ],
   "future_work": [
-    "Fine-tuning relevance, recency, and importance functions.",
-    "Improving architectural performance and cost-effectiveness.",
-    "Parallelizing agents or developing specialized LLMs for generative agents.",
-    "Longer-term evaluation to establish rigorous benchmarks.",
-    "Testing robustness against prompt/memory hacking.",
-    "Aligning underlying LLM values to mitigate bias."
+    "Enhancing the retrieval module by fine-tuning relevance, recency, and importance functions.",
+    "Improving the architecture's performance to make it more cost-effective.",
+    "Parallelizing agents or developing language models specifically for generative agents.",
+    "Observing agent behavior over extended periods to establish more rigorous benchmarks.",
+    "Testing the robustness of agents against prompt hacking and memory hacking.",
+    "Aligning the values of underlying language models with desired agent outcomes."
   ],
   "key_claims": [
     {
-      "claim": "Generative agents can produce believable individual and emergent social behaviors.",
+      "claim": "Generative agents produce believable individual and emergent social behaviors.",
       "where": "Abstract"
     },
     {
@@ -135,7 +145,7 @@
   "definitions_and_terms": [
     {
       "term": "Generative Agents",
-      "meaning": "Computational software agents that simulate believable human behavior by leveraging large language models and a memory/reflection/planning architecture."
+      "meaning": "Computational software agents that simulate believable human behavior."
     },
     {
       "term": "Memory Stream",
@@ -143,59 +153,62 @@
     },
     {
       "term": "Reflection",
-      "meaning": "A mechanism that synthesizes raw observations into higher-level, abstract thoughts to guide future behavior."
+      "meaning": "A mechanism that synthesizes memories into higher-level inferences over time."
+    },
+    {
+      "term": "Planning",
+      "meaning": "A mechanism that translates conclusions and current environment into high-level action plans and then recursively into detailed behaviors."
     }
   ],
-  "related_work_positioning": "The authors position their work within the long-standing goal of creating believable agents (e.g., Bates 1994, Laird and vanLent 2001). They contrast their approach with rule-based systems (e.g., finite-state machines, behavior trees) and reinforcement learning, arguing that these are either too rigid or limited to adversarial games. They build upon recent advancements in LLMs (e.g., Social Simulacra, Park et al. 2022) by adding a persistent, structured memory and reflection architecture to address the lack of long-term coherence in previous LLM-based agent attempts.",
+  "related_work_positioning": "The authors position their work as building upon prior research in human-AI interaction (e.g., SHRDLU, ELIZA), cognitive architectures (e.g., SOAR, ACT-R), and believable agents in games (e.g., The Sims). They distinguish their approach by using large language models to handle the complexity of open-world behavior, moving beyond the limitations of rule-based systems and first-order prompting by introducing a dynamic memory and reflection architecture.",
   "sections_summary": [
     {
       "section": "1 Introduction",
-      "summary": "Introduces the vision of creating believable computational agents that act consistently with past experiences. Defines generative agents and the core architecture components: memory, reflection, and planning."
+      "summary": "Introduces the goal of creating believable computational agents for interactive applications. Argues that large language models, when combined with an appropriate architecture for memory, reflection, and planning, can simulate believable human behavior in open worlds."
     },
     {
       "section": "2 Related Work",
-      "summary": "Reviews literature on human-AI interaction, believable agents, and the use of LLMs for simulating human behavior. Identifies the gap in long-term coherence and memory management."
+      "summary": "Reviews literature on human-AI interaction, believable agents, and the use of large language models for simulating human behavior. Positions the paper as a novel approach to creating long-term coherent agents."
     },
     {
       "section": "3 Generative Agent Behavior and Interaction",
-      "summary": "Describes the Smallville sandbox environment, how agents communicate, and provides examples of emergent social behaviors like information diffusion and coordination."
+      "summary": "Describes the Smallville sandbox environment and how agents interact with it and each other. Provides examples of emergent social behaviors like information diffusion and coordination."
     },
     {
       "section": "4 Generative Agent Architecture",
-      "summary": "Details the technical architecture: the memory stream (retrieval via recency, importance, relevance), reflection (synthesizing memories), and planning (top-down decomposition)."
+      "summary": "Details the core architecture: the memory stream, reflection, and planning. Explains how these components work together to enable agents to remember, reflect, and plan."
     },
     {
       "section": "5 Sandbox Environment Implementation",
-      "summary": "Explains the technical implementation using the Phaser framework and how the environment is grounded in natural language for the agents."
+      "summary": "Describes the technical implementation of the Smallville sandbox using the Phaser framework and how the environment is grounded in natural language for the agents."
     },
     {
       "section": "6 Controlled Evaluation",
-      "summary": "Describes the interview-based evaluation comparing the full architecture against various ablations and a human baseline, showing the full architecture is most believable."
+      "summary": "Details the interview-based evaluation of individual agent capabilities. Compares the full architecture against various ablations and a human baseline."
     },
     {
       "section": "7 End-to-End Evaluation",
-      "summary": "Details the two-day simulation in Smallville, measuring emergent social outcomes like information diffusion, relationship formation, and group coordination."
+      "summary": "Describes the two-day simulation of 25 agents to observe emergent social behaviors. Reports on information diffusion, relationship formation, and coordination."
     },
     {
       "section": "8 Discussion",
-      "summary": "Discusses applications, future work, limitations (e.g., cost, hallucinations), and ethical/societal risks (e.g., parasocial relationships, over-reliance)."
+      "summary": "Reflects on potential applications, limitations, and ethical risks of generative agents. Discusses future work to improve the architecture and evaluation."
+    },
+    {
+      "section": "9 Conclusion",
+      "summary": "Summarizes the paper's contributions and the potential for generative agents in various interactive applications."
     }
   ],
   "figures_and_tables": [
     {
       "id": "Figure 1",
-      "what_it_shows": "Overview of the Smallville sandbox environment with 25 agents.",
-      "key_numbers": null
-    },
-    {
-      "id": "Figure 5",
-      "what_it_shows": "Architecture diagram showing the flow between perception, memory stream, retrieval, reflection, and planning.",
-      "key_numbers": null
+      "what_it_shows": "Overview of generative agents in a sandbox environment.",
+      "key_numbers": "25 agents"
     },
     {
       "id": "Figure 8",
-      "what_it_shows": "TrueSkill ratings for the full architecture vs. ablated conditions and human baseline.",
-      "key_numbers": "Full: 29.89; No Reflection: 26.88; No Reflection/Planning: 25.64; Human: 22.95; Fully Ablated: 21.21"
+      "what_it_shows": "TrueSkill ratings for different agent architectures.",
+      "key_numbers": "Full Architecture (29.89), No Reflection (26.88), No Reflection/Planning (25.64), Human Crowdworker (22.95), No Memory/Planning/Reflection (21.21)"
     }
   ],
   "references_cited": [
@@ -205,24 +218,39 @@
       "year": 1994
     },
     {
-      "authors_short": "Laird & vanLent",
-      "title": "Human-Level AI’s Killer Application: Interactive Computer Games",
-      "year": 2001
-    },
-    {
-      "authors_short": "Park et al.",
-      "title": "Social Simulacra: Creating Populated Prototypes for Social Computing Systems",
-      "year": 2022
-    },
-    {
       "authors_short": "Brown et al.",
       "title": "Language Models are Few-Shot Learners",
       "year": 2020
     },
     {
-      "authors_short": "OpenAI",
-      "title": "Introducing ChatGPT",
-      "year": 2022
+      "authors_short": "Card et al.",
+      "title": "The psychology of human-computer interaction",
+      "year": 1983
+    },
+    {
+      "authors_short": "Dill and Martin",
+      "title": "A Game AI Approach to Autonomous Control of Virtual Characters",
+      "year": 2011
+    },
+    {
+      "authors_short": "Fast et al.",
+      "title": "Augur: Mining human behaviors from fiction to power interactive systems",
+      "year": 2016
+    },
+    {
+      "authors_short": "Hämäläinen et al.",
+      "title": "Evaluating Large Language Models in Generating Synthetic HCI Research Data: a Case Study",
+      "year": 2023
+    },
+    {
+      "authors_short": "Laird and VanLent",
+      "title": "Human-Level AI’s Killer Application: Interactive Computer Games",
+      "year": 2001
+    },
+    {
+      "authors_short": "McCoy et al.",
+      "title": "Prom Week: Social Physics as Gameplay",
+      "year": 2011
     },
     {
       "authors_short": "Newell",
@@ -230,9 +258,14 @@
       "year": 1990
     },
     {
-      "authors_short": "Card et al.",
-      "title": "The psychology of human-computer interaction",
-      "year": 1983
+      "authors_short": "Park et al.",
+      "title": "Social Simulacra: Creating Populated Prototypes for Social Computing Systems",
+      "year": 2022
+    },
+    {
+      "authors_short": "Riedl",
+      "title": "Interactive narrative: A novel application of artificial intelligence for computer games",
+      "year": 2012
     },
     {
       "authors_short": "Weizenbaum",
@@ -245,37 +278,19 @@
       "year": 1971
     },
     {
-      "authors_short": "McCoy et al.",
-      "title": "Prom Week: Social Physics as Gameplay",
-      "year": 2011
-    },
-    {
-      "authors_short": "Huang et al.",
-      "title": "Inner Monologue: Embodied Reasoning through Planning with Language Models",
+      "authors_short": "Wu et al.",
+      "title": "AI Chains: Transparent and Controllable Human-AI Interaction by Chaining Large Language Model Prompts",
       "year": 2022
     },
     {
-      "authors_short": "Wei et al.",
-      "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
-      "year": 2023
-    },
-    {
-      "authors_short": "Amershi et al.",
-      "title": "Guidelines for human-AI interaction",
-      "year": 2019
-    },
-    {
-      "authors_short": "Ouyang et al.",
-      "title": "Training language models to follow instructions with human feedback",
-      "year": 2022
-    },
-    {
-      "authors_short": "Bubeck et al.",
-      "title": "Sparks of artificial general intelligence: Early experiments with gpt-4",
-      "year": 2023
+      "authors_short": "Yannakakis",
+      "title": "Game AI revisited",
+      "year": 2012
     }
   ],
-  "reproducibility": "The authors provide a public repository for the simulation code (https://github.com/joonspk-research/generative_agents) and a demonstration link (https://reverie.herokuapp.com/UIST_Demo/). The paper details the prompts used for memory, reflection, and planning.",
+  "reproducibility": "The authors provide a demo link (https://reverie.herokuapp.com/UIST_Demo/) and a public repository for the simulation code (https://github.com/joonspk-research/generative_agents).",
   "source_file": "2304.03442v2.pdf",
-  "cite_key": "[Park et al., 2023]"
+  "cite_key": "[Park et al., 2023]",
+  "extracted_by": "gemini:gemini-3.1-flash-lite",
+  "truncated": false
 }

@@ -1,4 +1,4 @@
 # Change log
 
-- **added**: Framework name inconsistency - The paper switches between RCTA and NSRA.
-- **added**: Missing related work - The draft does not cite Reflexion, Voyager, or AutoGPT as requested.
+- **added**: Unified framework name - The draft uses both 'Cognitive Orchestration' and 'Nexus'. One must be chosen.
+- **added**: Citations for all benchmarks - Ensuring all claims about benchmarks are traceable to the source sheets.

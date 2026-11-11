@@ -1,0 +1,69 @@
+{
+  "claims": [
+    {
+      "claim": "Cognitive Orchestration/Nexus formalizes agentic behavior as a recursive, tuple-based memory update and retrieval process.",
+      "section": "Abstract",
+      "source": "own experiment",
+      "status": "hypothesis",
+      "note": "This is the proposed framework's core mechanism."
+    },
+    {
+      "claim": "The Transformer architecture achieves state-of-the-art translation quality with BLEU scores of 28.4 on WMT 2014 English-to-German and 41.8 on WMT 2014 English-to-French.",
+      "section": "Introduction",
+      "source": "[Vaswani et al., 2017] Table 2, page 8",
+      "status": "verified",
+      "note": "Accurately cited from source."
+    },
+    {
+      "claim": "CoT prompting improves performance on complex tasks like arithmetic and multi-hop inference.",
+      "section": "Introduction",
+      "source": "[Wei et al., 2022] Abstract",
+      "status": "verified",
+      "note": "Accurately cited from source."
+    },
+    {
+      "claim": "Toolformer allows models to learn to use tools in a self-supervised manner but is limited by an inability to chain tool outputs.",
+      "section": "Introduction",
+      "source": "[Schick et al., 2023] Section 7",
+      "status": "verified",
+      "note": "Accurately cited from source."
+    },
+    {
+      "claim": "Generative agents use memory and reflection to maintain social dynamics, but retrieval is decoupled from tool-based problem solving.",
+      "section": "Introduction",
+      "source": "[Park et al., 2023] Section 4",
+      "status": "verified",
+      "note": "Accurately cited from source."
+    },
+    {
+      "claim": "The proposed retrieval score balances semantic relevance with temporal recency to improve grounded task performance.",
+      "section": "Abstract",
+      "source": "own experiment",
+      "status": "hypothesis",
+      "note": "Proposed mechanism."
+    }
+  ],
+  "abstract_conclusion_mismatches": [
+    "The draft uses two different names for the framework ('Cognitive Orchestration' and 'Nexus')."
+  ],
+  "change_log": [
+    {
+      "action": "added",
+      "item": "Unified framework name",
+      "reason": "The draft uses both 'Cognitive Orchestration' and 'Nexus'. One must be chosen."
+    },
+    {
+      "action": "added",
+      "item": "Citations for all benchmarks",
+      "reason": "Ensuring all claims about benchmarks are traceable to the source sheets."
+    }
+  ],
+  "human_items": [
+    "Resolve the naming conflict between 'Cognitive Orchestration' and 'Nexus'.",
+    "Remove the duplicate 'Introduction' section.",
+    "Ensure the TikZ figure is rendered correctly in the final LaTeX.",
+    "Supply the actual experimental results for the proposed framework (currently only hypotheses are provided).",
+    "Add author names and affiliations."
+  ],
+  "_draft_sha256": "10923dd4a6f5e16d6397949cb2cf6ebb5c718eddeda1e070c5075c55319a7cc6"
+}

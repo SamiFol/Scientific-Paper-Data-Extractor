@@ -1,0 +1,6 @@
+ReAct ALFWorld success rate 71%
+ReAct HotpotQA 27.4 EM
+CoT PaLM-540B GSM8K 56.9%
+Toolformer ASDiv 40.4% vs GPT-3 14.0%
+Park et al. generative agents TrueSkill 29.89
+Transformer 28.4 BLEU WMT14 En-De

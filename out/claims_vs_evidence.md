@@ -2,17 +2,13 @@
 
 | # | Claim | Section | Source | Status | Note |
 |---|---|---|---|---|---|
-| 1 | The Transformer architecture replaced recurrent bottleneck architectures with multi-head self-attention, enabling massive parallelization. | Introduction | [Vaswani et al., 2017] / none | verified | Matches the source paper's abstract and contributions. |
-| 2 | CoT prompting improved performance on GSM8K, achieving 56.9% accuracy. | Abstract | [Wei et al., 2022] + Table 2, page 21 / none | verified | Matches the source paper's results. |
-| 3 | ReAct achieved a 71% success rate on ALFWorld. | Abstract | [Yao et al., 2023] + Table 3, page 8 / none | verified | Matches the source paper's results. |
-| 4 | Toolformer achieved 40.4% accuracy on ASDiv. | Abstract | [Schick et al., 2023] + Table 4, page 6 / none | verified | Matches the source paper's results. |
-| 5 | Generative agents achieved a 29.89 TrueSkill believability rating. | Abstract | [Park et al., 2023] + Figure 8, page 14 / none | verified | Matches the source paper's results. |
-| 6 | RCTA framework treats API interactions as first-class memory objects (ac, ic, r). | Abstract | own experiment | hypothesis | Proposed framework mechanism. |
-| 7 | RCTA targets a 20% reduction in redundant API calls. | Abstract | own experiment | hypothesis | Proposed performance goal. |
-| 8 | Transformer achieved 28.4 BLEU on WMT 2014 English-to-German. | Related Work | [Vaswani et al., 2017] + Table 2, page 8 / none | verified | Matches the source paper's results. |
-| 9 | Toolformer achieved 44.0% accuracy on MAWPS compared to 19.8% for GPT-3. | Related Work | [Schick et al., 2023] + Table 4, page 6 / none | verified | Matches the source paper's results. |
+| 1 | Cognitive Orchestration/Nexus formalizes agentic behavior as a recursive, tuple-based memory update and retrieval process. | Abstract | own experiment | hypothesis | This is the proposed framework's core mechanism. |
+| 2 | The Transformer architecture achieves state-of-the-art translation quality with BLEU scores of 28.4 on WMT 2014 English-to-German and 41.8 on WMT 2014 English-to-French. | Introduction | [Vaswani et al., 2017] Table 2, page 8 | verified | Accurately cited from source. |
+| 3 | CoT prompting improves performance on complex tasks like arithmetic and multi-hop inference. | Introduction | [Wei et al., 2022] Abstract | verified | Accurately cited from source. |
+| 4 | Toolformer allows models to learn to use tools in a self-supervised manner but is limited by an inability to chain tool outputs. | Introduction | [Schick et al., 2023] Section 7 | verified | Accurately cited from source. |
+| 5 | Generative agents use memory and reflection to maintain social dynamics, but retrieval is decoupled from tool-based problem solving. | Introduction | [Park et al., 2023] Section 4 | verified | Accurately cited from source. |
+| 6 | The proposed retrieval score balances semantic relevance with temporal recency to improve grounded task performance. | Abstract | own experiment | hypothesis | Proposed mechanism. |
 
 ## Abstract/Conclusion mismatches
 
-- The Abstract introduces the framework as 'Recursive Cognitive Tool-Agent (RCTA)', but the Conclusion refers to it as 'NeuroSymbolic-ReAct Agent (NSRA)'.
-- The Conclusion claims performance parity of a 13B model with 540B models, which is not mentioned in the Abstract or the Method section.
+- The draft uses two different names for the framework ('Cognitive Orchestration' and 'Nexus').

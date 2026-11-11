@@ -1,0 +1,5 @@
+{
+  "_note": "USD per 1M tokens as {\"in\": x, \"out\": y}. Fill from your provider's price page; a model without an entry gives cost=null (never guessed). Free-tier models: use 0.0.",
+  "gemini:gemini-3.1-flash-lite": {"in": 0.0, "out": 0.0},
+  "gemini:gemini-3-flash-preview": {"in": 0.0, "out": 0.0}
+}

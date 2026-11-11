@@ -12,30 +12,29 @@
   "year": 2023,
   "venue": "ICLR 2023",
   "arxiv_id": "2210.03629v3",
-  "abstract_summary": "Large language models (LLMs) have demonstrated impressive performance in reasoning and acting, but these capabilities have primarily been studied in isolation. This paper introduces ReAct, a paradigm that prompts LLMs to generate both reasoning traces and task-specific actions in an interleaved manner. This synergy allows reasoning traces to help the model induce, track, and update action plans, while actions allow the model to interface with external sources to gather information. The authors demonstrate ReAct's effectiveness on a diverse set of language and decision-making tasks, including HotpotQA, Fever, ALFWorld, and WebShop. ReAct outperforms state-of-the-art baselines, improves human interpretability, and enhances trustworthiness by grounding model outputs in external knowledge. It achieves significant absolute success rate improvements over imitation and reinforcement learning methods on interactive benchmarks.",
-  "problem_and_motivation": "The core problem addressed is the limitation of current LLMs in combining reasoning and acting. While 'Chain-of-Thought' (CoT) prompting enables verbal reasoning, it remains a static black box disconnected from the external world, leading to issues like fact hallucination and error propagation. Conversely, existing work on planning and acting in interactive environments often uses language models to predict actions without employing them to reason abstractly about high-level goals or maintain a working memory. The motivation is that human intelligence seamlessly combines task-oriented actions with verbal reasoning (inner speech) for self-regulation, strategization, and handling information uncertainty. The authors argue that a synergistic combination of reasoning and acting is necessary for robust, general-purpose task solving in autonomous systems.",
+  "abstract_summary": "Large language models (LLMs) have demonstrated impressive performance in language understanding and decision making, but their abilities for reasoning and acting have primarily been studied in isolation. This paper introduces ReAct, a paradigm that prompts LLMs to generate both reasoning traces and task-specific actions in an interleaved manner. This synergy allows reasoning traces to help the model track, update, and adjust action plans, while actions allow the model to interface with external sources to gather information. The authors apply ReAct to question answering, fact verification, and interactive decision-making tasks. Results show that ReAct outperforms state-of-the-art baselines, improves human interpretability, and enhances trustworthiness. On interactive benchmarks like ALFWorld and WebShop, ReAct achieves significant performance gains over imitation and reinforcement learning methods with minimal in-context examples.",
+  "problem_and_motivation": "The core problem is that existing LLM approaches for reasoning (like chain-of-thought prompting) and acting (like action plan generation) are often studied as separate, isolated topics. Chain-of-thought reasoning is a static black box that is not grounded in the external world, leading to issues like fact hallucination and error propagation. Conversely, existing methods for acting in interactive environments often rely on language priors to predict actions but lack the ability to reason abstractly about high-level goals or maintain a working memory to support acting. This paper aims to bridge this gap by synergizing reasoning and acting, enabling agents to perform dynamic reasoning to create and adjust plans while interacting with external environments to incorporate new information.",
   "contributions": [
-    "Introduces ReAct, a novel prompt-based paradigm that synergizes reasoning and acting in language models.",
-    "Performs extensive experiments across four diverse benchmarks (HotpotQA, FEVER, ALFWorld, WebShop) demonstrating the advantages of ReAct in few-shot learning setups.",
+    "Introduces ReAct, a novel prompt-based paradigm to synergize reasoning and acting in LLMs for general task solving.",
+    "Performs extensive experiments across diverse benchmarks (HotpotQA, FEVER, ALFWorld, WebShop) to showcase the advantage of ReAct in a few-shot learning setup.",
     "Presents systematic ablations and analysis to understand the importance of acting in reasoning tasks and reasoning in interactive tasks.",
-    "Analyzes the limitations of ReAct under the prompting setup and performs initial finetuning experiments showing potential for further improvement.",
-    "Demonstrates improved model interpretability, trustworthiness, and diagnosability through human-inspectable reasoning traces."
+    "Analyzes the limitations of ReAct under the prompting setup and performs initial finetuning experiments to show potential for improvement with additional training data."
   ],
   "method": {
-    "overview": "ReAct augments the agent's action space to A^ = A ∪ L, where L is the space of language. An action a^t ∈ L is a 'thought' or reasoning trace that does not affect the external environment but updates the context ct+1 = (ct, a^t) to support future reasoning or acting. The model is prompted with few-shot in-context examples of human trajectories consisting of interleaved thoughts, actions, and observations. For reasoning-heavy tasks, the model alternates between thoughts and actions. For interactive decision-making tasks, thoughts are generated sparsely to decompose goals, track progress, or handle exceptions.",
+    "overview": "ReAct augments the agent's action space to A^ = A ∪ L, where L is the space of language. An action a^t ∈ L is a 'thought' or reasoning trace that does not affect the external environment but updates the context to support future reasoning or acting. The model alternates between generating thoughts and actions, allowing it to decompose goals, track progress, handle exceptions, and incorporate external information from observations into its reasoning process.",
     "components": [
       {
-        "name": "Thought Generation",
-        "description": "The model generates free-form language thoughts to decompose task goals, track progress, inject commonsense knowledge, extract information from observations, or handle exceptions. These thoughts are not executed in the environment but serve as internal state updates to guide subsequent actions.",
-        "equations_or_algorithms": "ct+1 = (ct, a^t)"
+        "name": "ReAct Prompting",
+        "description": "The model is prompted with a few-shot in-context example consisting of a human trajectory of actions, thoughts, and environment observations. For knowledge-intensive tasks, the model alternates between thoughts and actions (e.g., search, lookup, finish). For interactive decision-making tasks, thoughts are generated more sparsely to guide the agent's high-level planning and subgoal tracking.",
+        "equations_or_algorithms": "A^ = A ∪ L; ct+1 = (ct, a^t)"
       },
       {
-        "name": "Action Execution",
-        "description": "The model generates task-specific actions (e.g., search[entity], lookup[string], finish[answer] for QA; navigation/interaction commands for ALFWorld/WebShop) that interface with an external environment. The environment returns an observation ot, which is then used by the model to generate the next thought or action.",
-        "equations_or_algorithms": "at = π(at|ct)"
+        "name": "Combining Internal and External Knowledge",
+        "description": "The authors propose a hybrid approach combining ReAct and CoT-SC (Self-Consistency). ReAct → CoT-SC: If ReAct fails to return an answer within a fixed number of steps, the model backs off to CoT-SC. CoT-SC → ReAct: If the majority answer among n CoT-SC samples occurs less than n/2 times, the model backs off to ReAct, assuming internal knowledge is insufficient.",
+        "equations_or_algorithms": null
       }
     ],
-    "settings": "The primary base model is PaLM-540B. Experiments use few-shot in-context learning (1-6 examples). For finetuning, the authors use a bootstrapping approach with 3,000 trajectories to finetune smaller models (PaLM-8B/62B) with a batch size of 64. For HotpotQA/FEVER, the model interacts with a Wikipedia API. For ALFWorld/WebShop, it interacts with the respective simulated environments."
+    "settings": "Base model: PaLM-540B. For finetuning: PaLM-8B and PaLM-62B. Datasets: HotpotQA, FEVER, ALFWorld, WebShop. Compute: Google TPU infrastructure."
   },
   "experiments": {
     "tasks_and_datasets": [
@@ -47,292 +46,219 @@
       {
         "name": "FEVER",
         "description": "Fact verification benchmark (SUPPORTS, REFUTES, NOT ENOUGH INFO).",
-        "metric": "Accuracy (Acc)"
+        "metric": "Accuracy"
       },
       {
         "name": "ALFWorld",
-        "description": "Text-based synthetic household environment requiring long-horizon planning.",
+        "description": "Text-based interactive game requiring high-level goal achievement in a simulated household.",
         "metric": "Success Rate"
       },
       {
         "name": "WebShop",
-        "description": "Online shopping environment with real-world products and human instructions.",
+        "description": "Online shopping website environment requiring product search and selection based on user instructions.",
         "metric": "Average Score and Success Rate"
       }
     ],
     "baselines": [
-      "Standard prompting (no thoughts/actions)",
-      "Chain-of-Thought (CoT) (reasoning only)",
+      "Standard prompting",
+      "Chain-of-thought (CoT)",
       "CoT-SC (Self-Consistency)",
-      "Act-only (actions only)",
-      "Supervised SoTA (for QA)",
+      "Act-only (Act)",
       "BUTLER (for ALFWorld)",
-      "Imitation Learning (IL) and IL+RL (for WebShop)",
-      "Inner Monologue (IM) (for ALFWorld)"
+      "Imitation Learning (IL) / IL+RL (for WebShop)"
     ],
-    "setup_details": "Experiments use few-shot prompting with manually composed trajectories. For HotpotQA/FEVER, the authors combine ReAct and CoT-SC using heuristics to switch between methods. Finetuning is performed on 3,000 trajectories. ALFWorld evaluation uses 134 unseen games."
+    "setup_details": "Few-shot prompting with 1-6 examples. For finetuning, 3,000 trajectories were used. Wikipedia API provided for HotpotQA and FEVER."
   },
   "results": [
     {
-      "experiment": "HotpotQA (PaLM-540B)",
-      "comparison": "ReAct vs. Standard, CoT, Act, and combinations",
-      "numbers": "Standard: 28.7, CoT: 29.4, Act: 25.7, ReAct: 27.4, CoT-SC -> ReAct: 34.2, ReAct -> CoT-SC: 35.1",
-      "model_size": "540B",
-      "setting": "few-shot",
-      "where": "Table 1, page 5",
-      "takeaway": "ReAct combined with CoT-SC yields the best performance."
+      "experiment": "HotpotQA (Prompting)",
+      "comparison": "ReAct vs. Baselines",
+      "numbers": "Standard: 28.7, CoT: 29.4, CoT-SC: 33.4, Act: 25.7, ReAct: 27.4, CoT-SC → ReAct: 34.2, ReAct → CoT-SC: 35.1",
+      "model_size": "PaLM-540B",
+      "setting": "Few-shot",
+      "where": "Table 1",
+      "takeaway": "ReAct → CoT-SC achieves the best performance."
     },
     {
-      "experiment": "FEVER (PaLM-540B)",
-      "comparison": "ReAct vs. Standard, CoT, Act, and combinations",
-      "numbers": "Standard: 57.1, CoT: 56.3, Act: 58.9, ReAct: 60.9, CoT-SC -> ReAct: 64.6, ReAct -> CoT-SC: 62.0",
-      "model_size": "540B",
-      "setting": "few-shot",
-      "where": "Table 1, page 5",
-      "takeaway": "ReAct outperforms CoT and Act, with combinations yielding the best results."
+      "experiment": "FEVER (Prompting)",
+      "comparison": "ReAct vs. Baselines",
+      "numbers": "Standard: 57.1, CoT: 56.3, CoT-SC: 60.4, Act: 58.9, ReAct: 60.9, CoT-SC → ReAct: 64.6, ReAct → CoT-SC: 62.0",
+      "model_size": "PaLM-540B",
+      "setting": "Few-shot",
+      "where": "Table 1",
+      "takeaway": "CoT-SC → ReAct achieves the best performance."
     },
     {
       "experiment": "ALFWorld",
-      "comparison": "ReAct vs. Act, ReAct-IM, and BUTLER",
-      "numbers": "ReAct (best of 6): 71%, Act (best of 6): 45%, BUTLER (best of 8): 37%",
-      "model_size": "540B",
-      "setting": "few-shot",
-      "where": "Table 3, page 8",
-      "takeaway": "ReAct significantly outperforms Act and prior imitation learning baselines."
+      "comparison": "ReAct (best of 6) vs. Act (best of 6) vs. BUTLER (best of 8)",
+      "numbers": "ReAct: 71%, Act: 45%, BUTLER: 37%",
+      "model_size": "PaLM-540B",
+      "setting": "Few-shot",
+      "where": "Table 3",
+      "takeaway": "ReAct significantly outperforms Act and BUTLER."
     },
     {
       "experiment": "WebShop",
-      "comparison": "ReAct vs. Act, IL, IL+RL",
-      "numbers": "ReAct: 66.6 score / 40.0% SR, Act: 62.3 score / 30.1% SR, IL: 59.9 score / 29.1% SR",
-      "model_size": "540B",
-      "setting": "few-shot",
-      "where": "Table 4, page 8",
-      "takeaway": "ReAct achieves an absolute 10% improvement in success rate over the best baseline."
+      "comparison": "ReAct vs. Act vs. IL/IL+RL",
+      "numbers": "ReAct: 40.0% SR, Act: 30.1% SR, IL: 29.1% SR, IL+RL: 28.7% SR",
+      "model_size": "PaLM-540B",
+      "setting": "Few-shot",
+      "where": "Table 4",
+      "takeaway": "ReAct achieves an absolute 10% improvement over previous best."
     }
   ],
   "claims_table": [
     {
-      "claim": "ReAct outperforms vanilla action generation models on HotpotQA/FEVER.",
-      "metric": "EM/Acc",
-      "value": "27.4/60.9 vs 25.7/58.9",
-      "benchmark": "HotpotQA/FEVER",
-      "model_size": "540B",
-      "setting": "few-shot",
-      "where": "Table 1"
-    },
-    {
-      "claim": "ReAct outperforms imitation/RL methods on ALFWorld.",
+      "claim": "ReAct outperforms Act consistently on ALFWorld.",
       "metric": "Success Rate",
-      "value": "71% vs 37%",
+      "value": "71% (ReAct) vs 45% (Act)",
       "benchmark": "ALFWorld",
-      "model_size": "540B",
-      "setting": "few-shot",
+      "model_size": "PaLM-540B",
+      "setting": "Few-shot",
       "where": "Table 3"
     },
     {
-      "claim": "ReAct outperforms IL/RL methods on WebShop.",
+      "claim": "ReAct achieves better performance than IL and IL+RL on WebShop.",
       "metric": "Success Rate",
-      "value": "40.0% vs 28.7%",
+      "value": "40.0% (ReAct) vs 28.7% (IL+RL)",
       "benchmark": "WebShop",
-      "model_size": "540B",
-      "setting": "few-shot",
+      "model_size": "PaLM-540B",
+      "setting": "Few-shot",
       "where": "Table 4"
     }
   ],
   "ablations_and_analysis": [
     {
       "what_varied": "Number of CoT-SC samples",
-      "finding": "ReAct + CoT-SC consistently outperforms CoT-SC across different sample counts, reaching CoT-SC performance with significantly fewer samples.",
-      "numbers": "Figure 2, page 5"
+      "finding": "ReAct + CoT-SC consistently outperforms CoT-SC across different numbers of samples, reaching CoT-SC performance with significantly fewer samples.",
+      "numbers": "3-5 samples (ReAct+CoT-SC) vs 21 samples (CoT-SC)"
     },
     {
-      "what_varied": "Prompting vs. Finetuning",
-      "finding": "Finetuning ReAct on 3,000 examples makes it the best-performing method, outperforming prompting-based methods.",
-      "numbers": "Figure 3, page 7"
+      "what_varied": "Finetuning vs. Prompting",
+      "finding": "Finetuning ReAct with 3,000 examples makes it the best-performing method, outperforming prompting methods.",
+      "numbers": "PaLM-8B finetuned ReAct > all PaLM-62B prompting methods"
     },
     {
-      "what_varied": "Reasoning type (ReAct vs. ReAct-IM)",
-      "finding": "ReAct substantially outperforms IM-style prompting (dense external feedback) due to better high-level goal decomposition and commonsense reasoning.",
-      "numbers": "71% vs 53% success rate on ALFWorld"
+      "what_varied": "ReAct vs. ReAct-IM (Inner Monologue)",
+      "finding": "ReAct substantially outperforms IM-style prompting due to better high-level goal decomposition and commonsense reasoning.",
+      "numbers": "71% vs 53% overall success rate"
     }
   ],
   "limitations": [
     "Complex tasks with large action spaces require more demonstrations to learn well, which can exceed the input length limit of in-context learning.",
-    "The structural constraint of interleaving reasoning and acting can reduce flexibility in formulating reasoning steps, leading to specific 'reasoning errors' (e.g., repetitive loops).",
-    "Non-informative search results can derail model reasoning and make it difficult to recover.",
-    "Performance is still significantly lower than domain-specific state-of-the-art approaches (e.g., Supervised SoTA on HotpotQA)."
+    "Structural constraints of interleaving reasoning and acting can reduce flexibility in formulating reasoning steps, leading to reasoning errors.",
+    "Non-informative search results can derail model reasoning.",
+    "The model can get stuck in repetitive loops of thoughts and actions."
   ],
   "failure_modes": [
     "Reasoning errors (e.g., failing to recover from repetitive steps).",
     "Search result errors (e.g., search returns empty or non-useful information).",
-    "Hallucination (less frequent than in CoT, but still possible).",
-    "Label ambiguity (prediction is correct but does not match the label format)."
+    "Hallucination (though significantly lower than CoT).",
+    "Label ambiguity."
   ],
   "future_work": [
     "Scaling up ReAct with multi-task training.",
     "Combining ReAct with reinforcement learning.",
-    "Using better decoding strategies (e.g., beam search) to address repetitive loop errors.",
-    "Learning from more high-quality human annotations."
+    "Using better decoding strategies (e.g., beam search) to address repetitive loops.",
+    "Incorporating human feedback in a more systematic manner."
   ],
   "key_claims": [
     {
-      "claim": "ReAct synergizes reasoning and acting, leading to superior performance and interpretability.",
-      "where": "Abstract/Introduction"
+      "claim": "ReAct synergizes reasoning and acting, allowing for dynamic planning and grounded information gathering.",
+      "where": "Abstract / Introduction"
     },
     {
-      "claim": "ReAct is more grounded and trustworthy than CoT due to external environment access.",
-      "where": "Section 3.3"
+      "claim": "ReAct improves interpretability and trustworthiness compared to CoT.",
+      "where": "Section 3.3 / Table 2"
     },
     {
-      "claim": "ReAct is a general paradigm applicable to diverse tasks.",
-      "where": "Section 4"
+      "claim": "ReAct outperforms imitation and reinforcement learning methods on interactive decision-making benchmarks.",
+      "where": "Abstract / Section 4"
     }
   ],
   "definitions_and_terms": [
     {
       "term": "ReAct",
-      "meaning": "A paradigm that prompts LLMs to generate both verbal reasoning traces and task-specific actions in an interleaved manner."
+      "meaning": "A paradigm that prompts LLMs to generate both reasoning traces (thoughts) and task-specific actions in an interleaved manner."
     },
     {
       "term": "Thought",
-      "meaning": "A reasoning trace generated by the model that does not affect the external environment but updates the context to support future reasoning or acting."
+      "meaning": "A reasoning trace in the language space that does not affect the external environment but updates the context to support future reasoning or acting."
     },
     {
-      "term": "Action",
-      "meaning": "A command generated by the model that interfaces with an external environment and receives an observation."
-    },
-    {
-      "term": "CoT-SC",
-      "meaning": "Chain-of-Thought with Self-Consistency, where multiple reasoning paths are sampled and the majority answer is chosen."
+      "term": "Act",
+      "meaning": "An action in the environment that generates an observation."
     }
   ],
-  "related_work_positioning": "The authors position ReAct as an advancement over Chain-of-Thought (Wei et al., 2022) by grounding reasoning in external environments. It is also contrasted with interactive decision-making approaches like WebGPT (Nakano et al., 2021) and SayCan/Inner Monologue (Ahn et al., 2022; Huang et al., 2022b). ReAct is argued to be more flexible and general than these approaches because it does not rely on expensive human feedback for RL or limited, task-specific feedback, but rather uses language as a fundamental cognitive mechanism for both reasoning and acting.",
+  "related_work_positioning": "ReAct is positioned as an improvement over Chain-of-Thought (CoT) (Wei et al., 2022) by grounding reasoning in external observations. It is also compared to WebGPT (Nakano et al., 2021) and Inner Monologue (Huang et al., 2022b). Unlike WebGPT, ReAct explicitly models the thinking process. Unlike Inner Monologue, ReAct uses flexible, sparse reasoning traces rather than just environment-injected feedback.",
   "sections_summary": [
     {
       "section": "1 Introduction",
-      "summary": "Introduces the concept of synergizing reasoning and acting, inspired by human cognition. Highlights the limitations of existing isolated reasoning (CoT) and acting approaches, and introduces ReAct as a solution."
+      "summary": "Introduces the concept of synergizing reasoning and acting, inspired by human cognition. Argues that current LLM approaches treat reasoning and acting as separate, leading to limitations in grounding and planning."
     },
     {
       "section": "2 ReAct: Synergizing Reasoning + Acting",
-      "summary": "Defines the ReAct paradigm, where the action space is augmented with language (thoughts). Explains how thoughts and actions are interleaved to support task solving."
+      "summary": "Defines the ReAct paradigm, where the action space is augmented with a language space for 'thoughts'. Explains how thoughts help in goal decomposition, tracking, and handling exceptions."
     },
     {
       "section": "3 Knowledge-Intensive Reasoning Tasks",
-      "summary": "Evaluates ReAct on HotpotQA and FEVER using a Wikipedia API. Shows that ReAct outperforms baselines and benefits from combinations with CoT-SC and finetuning."
+      "summary": "Evaluates ReAct on HotpotQA and FEVER. Shows that ReAct outperforms Act and is competitive with CoT, with the best results coming from a combination of ReAct and CoT-SC."
     },
     {
       "section": "4 Decision Making Tasks",
-      "summary": "Evaluates ReAct on ALFWorld and WebShop. Demonstrates that ReAct outperforms imitation and reinforcement learning methods and highlights its interpretability and human-in-the-loop potential."
+      "summary": "Evaluates ReAct on ALFWorld and WebShop. Demonstrates significant performance gains over imitation and reinforcement learning baselines."
     },
     {
       "section": "5 Related Work",
-      "summary": "Discusses related literature on LLMs for reasoning and decision-making, positioning ReAct as a more flexible and synergistic approach."
+      "summary": "Reviews prior work on LLMs for reasoning (CoT, etc.) and decision making (WebGPT, Inner Monologue), positioning ReAct as a more flexible and grounded approach."
     },
     {
       "section": "6 Conclusion",
-      "summary": "Summarizes the contributions and suggests future directions, including multi-task training and integration with reinforcement learning."
+      "summary": "Summarizes the contributions and suggests future directions, including multi-task training and reinforcement learning."
     }
   ],
   "figures_and_tables": [
     {
       "id": "Figure 1",
       "what_it_shows": "Comparison of prompting methods (Standard, CoT, Act, ReAct) on HotpotQA and ALFWorld.",
-      "key_numbers": "N/A"
+      "key_numbers": "Visual demonstration of trajectories."
     },
     {
       "id": "Table 1",
       "what_it_shows": "PaLM-540B prompting results on HotpotQA and Fever.",
-      "key_numbers": "ReAct -> CoT-SC: 35.1 EM (HotpotQA), 62.0 Acc (Fever)"
+      "key_numbers": "ReAct → CoT-SC: 34.2 (HotpotQA), 64.6 (Fever)."
     },
     {
       "id": "Table 3",
       "what_it_shows": "ALFWorld task-specific success rates.",
-      "key_numbers": "ReAct (best of 6): 71%, BUTLER (best of 8): 37%"
+      "key_numbers": "ReAct (best of 6): 71%, Act (best of 6): 45%, BUTLER (best of 8): 37%."
     },
     {
       "id": "Table 4",
       "what_it_shows": "Score and success rate on Webshop.",
-      "key_numbers": "ReAct: 66.6 score, 40.0% SR"
+      "key_numbers": "ReAct: 40.0% SR, Act: 30.1% SR."
     }
   ],
   "references_cited": [
-    {
-      "authors_short": "Wei et al.",
-      "title": "Chain of thought prompting elicits reasoning in large language models",
-      "year": 2022
-    },
-    {
-      "authors_short": "Chowdhery et al.",
-      "title": "Palm: Scaling language modeling with pathways",
-      "year": 2022
-    },
-    {
-      "authors_short": "Yang et al.",
-      "title": "Hotpotqa: A dataset for diverse, explainable multi-hop question answering",
-      "year": 2018
-    },
-    {
-      "authors_short": "Thorne et al.",
-      "title": "Fever: a large-scale dataset for fact extraction and verification",
-      "year": 2018
-    },
-    {
-      "authors_short": "Shridhar et al.",
-      "title": "Alfworld: Aligning text and embodied environments for interactive learning",
-      "year": 2020
-    },
-    {
-      "authors_short": "Yao et al.",
-      "title": "Webshop: Towards scalable real-world web interaction with grounded language agents",
-      "year": 2022
-    },
-    {
-      "authors_short": "Nakano et al.",
-      "title": "Webgpt: Browser-assisted question-answering with human feedback",
-      "year": 2021
-    },
-    {
-      "authors_short": "Huang et al.",
-      "title": "Inner monologue: Embodied reasoning through planning with language models",
-      "year": 2022
-    },
-    {
-      "authors_short": "Ahn et al.",
-      "title": "Do as i can, not as i say: Grounding language in robotic affordances",
-      "year": 2022
-    },
-    {
-      "authors_short": "Zelikman et al.",
-      "title": "Star: Bootstrapping reasoning with reasoning",
-      "year": 2022
-    },
-    {
-      "authors_short": "Wang et al.",
-      "title": "Self-consistency improves chain of thought reasoning in language models",
-      "year": 2022
-    },
-    {
-      "authors_short": "Brown et al.",
-      "title": "Language models are few-shot learners",
-      "year": 2020
-    },
-    {
-      "authors_short": "Creswell et al.",
-      "title": "Selection-inference: Exploiting large language models for interpretable logical reasoning",
-      "year": 2022
-    },
-    {
-      "authors_short": "Nye et al.",
-      "title": "Show your work: Scratchpads for intermediate computation with language models",
-      "year": 2021
-    },
-    {
-      "authors_short": "Shuster et al.",
-      "title": "Language models that seek for knowledge: Modular search & generation for dialogue and prompt completion",
-      "year": 2022
-    }
+    "Wei et al. (2022) Chain of thought prompting elicits reasoning in large language models.",
+    "Chowdhery et al. (2022) PaLM: Scaling language modeling with pathways.",
+    "Shridhar et al. (2020b) Alfworld: Aligning text and embodied environments for interactive learning.",
+    "Yao et al. (2022) Webshop: Towards scalable real-world web interaction with grounded language agents.",
+    "Huang et al. (2022b) Inner monologue: Embodied reasoning through planning with language models.",
+    "Nakano et al. (2021) Webgpt: Browser-assisted question-answering with human feedback.",
+    "Zelikman et al. (2022) Star: Bootstrapping reasoning with reasoning.",
+    "Wang et al. (2022a) Self-consistency improves chain of thought reasoning in language models.",
+    "Yang et al. (2018) Hotpotqa: A dataset for diverse, explainable multi-hop question answering.",
+    "Thorne et al. (2018) Fever: A large-scale dataset for fact extraction and verification.",
+    "Ahn et al. (2022) Do as i can, not as i say: Grounding language in robotic affordances.",
+    "Brown et al. (2020) Language models are few-shot learners.",
+    "Creswell et al. (2022) Selection-inference: Exploiting large language models for interpretable logical reasoning.",
+    "Nye et al. (2021) Show your work: Scratchpads for intermediate computation with language models.",
+    "Shuster et al. (2022b) Blenderbot 3: A deployed conversational agent that continually learns to responsibly engage."
   ],
-  "reproducibility": "The paper uses PaLM-540B (not openly accessible). Prompts are provided in Appendix C. Additional experiments using GPT-3 are in Appendix A.1, and the associated code is available at https://anonymous.4open.science/r/ReAct-2268/.",
+  "reproducibility": "The paper provides prompts in Appendix C, additional GPT-3 experiments in Appendix A.1, and code at https://react-lm.github.io/.",
   "source_file": "2210.03629v3.pdf",
-  "cite_key": "[Yao et al., 2023]"
+  "cite_key": "[Yao et al., 2023]",
+  "extracted_by": "gemini:gemini-3.1-flash-lite",
+  "truncated": false
 }

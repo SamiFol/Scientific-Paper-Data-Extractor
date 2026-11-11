@@ -1,0 +1,41 @@
+PROMPTS - plain text you can read and edit. No Python knowledge needed.
+
+Rules for editing
+- {{NAME}} (UPPERCASE) is filled by the code. Do not rename or delete it; the program stops with an error if you do.
+- The answer format is written as a plain field list between [fields] and [/fields]:
+      name: text                         a text value            -> "name": str
+      year: whole number                 a number                -> "year": int
+      ok: yes/no                         true/false
+      tags: list of text                 a list of texts
+      status: one of a | b | c           one value from a fixed set
+      note: any other words              a description of what to write there
+      steps: list, each with:            a list of objects; the indented lines below are their fields
+        name: text
+  Indentation (2 spaces) means "inside". The program converts this list to JSON before sending it to the model,
+  so the model still answers in JSON. You may reword descriptions freely.
+  DO NOT rename or delete a field name: the code reads these names (tests/test_prompts.py checks them).
+- If you change a prompt, delete out/ files made by that step (python main.py --fresh ...) so it is re-run.
+- prompts/experiment_*.md are frozen by `python -m experiment.run --lock`; changing them afterwards blocks the main run.
+
+Files, in pipeline order
+global_rules.md            the anti-invention rules shared by analyst, writer, reviewer, fixer
+extractor.md               step 1: builds a detailed sheet from one PDF (JSON keys fixed)
+analyst.md                 step 2: analysis, gap, novelty, framework, hypotheses, outline (JSON keys fixed)
+analyst_input.md           what the analyst receives (topic, plan, status, sheets)
+analyst_outline_position.md   required outline for a position paper (no results section)
+analyst_outline_empirical.md  required outline for an empirical paper
+writer.md                  step 3: writing style and rules
+writer_type_position.md / writer_type_empirical.md   extra rules by paper type
+writer_section.md          what the writer receives for each section
+writer_extra_figure1.md / writer_extra_table1.md / writer_extra_algorithm.md   added when the outline asks for them
+writer_expand.md           used when a section comes out too short
+writer_abstract.md         abstract written after all sections
+reviewer.md                step 4: claims-vs-evidence audit (JSON keys fixed)
+reviewer_input.md          what the reviewer receives
+fixer.md / fixer_rewrite.md   fix loop: rewrite only sections with blocking issues
+experiment_agent.md        ReAct agent instructions (experiment)
+experiment_reflect.md      reflection instructions (experiment)
+rag_answer.md              MCP server: answer a question about one PDF from retrieved excerpts
+rag_answer_input.md        what that prompt receives (paper, question, excerpts)
+rag_summary.md             MCP server: summarize one PDF from retrieved excerpts (sections fixed)
+rag_summary_input.md       what that prompt receives
