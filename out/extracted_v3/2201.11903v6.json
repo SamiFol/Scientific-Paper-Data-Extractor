@@ -1,0 +1,302 @@
+{
+  "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+  "authors": [
+    "Jason Wei",
+    "Xuezhi Wang",
+    "Dale Schuurmans",
+    "Maarten Bosma",
+    "Brian Ichter",
+    "Fei Xia",
+    "Ed H. Chi",
+    "Quoc V. Le",
+    "Denny Zhou"
+  ],
+  "year": 2022,
+  "venue": "NeurIPS 2022",
+  "arxiv_id": "2201.11903v6",
+  "abstract_summary": "This paper introduces chain-of-thought (CoT) prompting, a method to improve the reasoning capabilities of large language models (LLMs). By providing a few examples of intermediate reasoning steps in the prompt, LLMs are encouraged to generate a coherent chain of thought before arriving at a final answer. The authors demonstrate that this approach significantly enhances performance on complex arithmetic, commonsense, and symbolic reasoning tasks. Notably, CoT reasoning is shown to be an emergent ability that appears in sufficiently large models. Experiments show that prompting PaLM 540B with just eight CoT exemplars achieves state-of-the-art results on the GSM8K math benchmark, surpassing even finetuned models.",
+  "problem_and_motivation": "Large language models have shown significant progress in various NLP tasks, but scaling model size alone has not been sufficient to achieve high performance on complex reasoning tasks such as arithmetic, commonsense, and symbolic manipulation. Traditional few-shot prompting (input-output pairs) often fails on these tasks, and while finetuning with rationales is possible, it is costly to create large datasets of high-quality rationales. The authors aim to bridge this gap by enabling LLMs to perform multi-step reasoning using only in-context learning (prompting), without the need for expensive finetuning or large training datasets.",
+  "contributions": [
+    "Introduction of chain-of-thought (CoT) prompting, a simple method to elicit multi-step reasoning in LLMs.",
+    "Demonstration that CoT prompting significantly improves performance on arithmetic, commonsense, and symbolic reasoning benchmarks.",
+    "Evidence that CoT reasoning is an emergent property of model scale, typically requiring models with ~100B parameters.",
+    "Empirical results showing that CoT prompting with PaLM 540B achieves state-of-the-art performance on GSM8K, outperforming finetuned models.",
+    "Comprehensive ablation studies showing robustness to different annotators, exemplars, and prompting styles.",
+    "Analysis of why CoT prompting works, including error analysis and investigation of length generalization in symbolic tasks."
+  ],
+  "method": {
+    "overview": "Chain-of-thought prompting involves augmenting few-shot exemplars with a series of intermediate natural language reasoning steps that lead to the final answer. Instead of providing only input-output pairs, the prompt includes triples of (input, chain of thought, output). This allows the model to decompose complex problems into smaller, manageable steps, effectively allocating more computation to harder problems.",
+    "components": [
+      {
+        "name": "Chain-of-Thought Exemplars",
+        "description": "The core component is a set of few-shot examples where each example includes a manually written chain of thought. This chain of thought mimics a step-by-step human reasoning process. During inference, the model is provided with these exemplars and is expected to generate a similar reasoning chain for the test input.",
+        "equations_or_algorithms": "The prompt structure is: Q: [Question] A: [Reasoning Steps] The answer is [Final Answer]."
+      }
+    ],
+    "settings": "The authors evaluate five LLMs: GPT-3 (text-ada-001, text-babbage-001, text-curie-001, text-davinci-002), LaMDA (422M, 2B, 8B, 68B, 137B), PaLM (8B, 62B, 540B), UL2 20B, and Codex (code-davinci-002). Inference is performed using greedy decoding. For LaMDA, results are averaged over five random seeds with different exemplar orders. For other models, a single order is used."
+  },
+  "experiments": {
+    "tasks_and_datasets": [
+      {
+        "name": "GSM8K",
+        "description": "Math word problems",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "SVAMP",
+        "description": "Math word problems with varying structures",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "ASDiv",
+        "description": "Diverse math word problems",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "AQuA",
+        "description": "Algebraic word problems",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "MAWPS",
+        "description": "Math word problem repository",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "CSQA",
+        "description": "Commonsense reasoning",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "StrategyQA",
+        "description": "Multi-hop reasoning",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "Date Understanding",
+        "description": "Inferring dates",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "Sports Understanding",
+        "description": "Plausibility of sports sentences",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "SayCan",
+        "description": "Robot planning",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "Last Letter Concatenation",
+        "description": "Symbolic manipulation",
+        "metric": "Accuracy (%)"
+      },
+      {
+        "name": "Coin Flip",
+        "description": "State tracking",
+        "metric": "Accuracy (%)"
+      }
+    ],
+    "baselines": [
+      "Standard few-shot prompting (input-output pairs)",
+      "Prior state-of-the-art (typically finetuned models)"
+    ],
+    "setup_details": "The authors use a fixed set of eight chain-of-thought exemplars for most benchmarks. For AQuA, they use four exemplars from the training set. For BIG-bench tasks (Date, Sports), they use the first ten examples as exemplars. For SayCan, they use six examples from the training set."
+  },
+  "results": [
+    {
+      "experiment": "GSM8K",
+      "comparison": "PaLM 540B standard vs. CoT prompting",
+      "numbers": "17.9% (standard) vs. 56.9% (CoT)",
+      "model_size": "540B",
+      "setting": "few-shot",
+      "where": "Table 2, page 21",
+      "takeaway": "CoT prompting leads to massive gains on complex math problems."
+    },
+    {
+      "experiment": "StrategyQA",
+      "comparison": "PaLM 540B standard vs. CoT prompting",
+      "numbers": "68.6% (standard) vs. 77.8% (CoT)",
+      "model_size": "540B",
+      "setting": "few-shot",
+      "where": "Table 4, page 22",
+      "takeaway": "CoT improves performance on multi-hop reasoning tasks."
+    }
+  ],
+  "claims_table": [
+    {
+      "claim": "CoT prompting achieves state-of-the-art on GSM8K",
+      "metric": "Accuracy",
+      "value": "56.9%",
+      "benchmark": "GSM8K",
+      "model_size": "540B",
+      "setting": "few-shot",
+      "where": "Table 2, page 21"
+    }
+  ],
+  "ablations_and_analysis": [
+    {
+      "what_varied": "Prompting strategy (Equation only, Variable compute only, Reasoning after answer)",
+      "finding": "Standard CoT prompting outperforms these variations, suggesting that the natural language reasoning steps are crucial.",
+      "numbers": "For GSM8K (LaMDA 137B): Standard 6.5%, CoT 14.3%, Equation only 5.4%, Variable compute 6.4%, Reasoning after answer 6.1%."
+    }
+  ],
+  "limitations": [
+    "CoT prompting requires manual creation of exemplars (though this is minimal in few-shot settings).",
+    "There is no guarantee of correct reasoning paths; models can arrive at correct answers via incorrect logic.",
+    "CoT reasoning is an emergent ability that only appears at large model scales, making it costly to serve.",
+    "Gains from CoT do not transfer perfectly across different models."
+  ],
+  "failure_modes": [
+    "Semantic understanding errors (e.g., misinterpreting the problem).",
+    "One-step missing errors (logical gaps).",
+    "Calculator errors (incorrect arithmetic).",
+    "Incoherent chains of thought (hallucinations or violation of world knowledge)."
+  ],
+  "future_work": [
+    "Improving the factuality of language model generations.",
+    "Investigating how to induce reasoning in smaller models.",
+    "Automatically generating chains of thought via prompting.",
+    "Evaluating CoT prompting on more diverse tasks like machine translation."
+  ],
+  "key_claims": [
+    {
+      "claim": "Chain-of-thought prompting significantly improves performance on complex reasoning tasks.",
+      "where": "Abstract, Introduction"
+    },
+    {
+      "claim": "CoT reasoning is an emergent ability of model scale.",
+      "where": "Section 3.2, Figure 4"
+    }
+  ],
+  "definitions_and_terms": [
+    {
+      "term": "Chain-of-thought (CoT) prompting",
+      "meaning": "A prompting method where a few examples of intermediate reasoning steps are provided to guide the model's reasoning process."
+    },
+    {
+      "term": "Emergent ability",
+      "meaning": "A capability that appears in models only after they reach a certain scale (e.g., ~100B parameters)."
+    }
+  ],
+  "related_work_positioning": "The paper builds upon work in prompting (Brown et al., 2020), natural language explanations (Zhou et al., 2020; Wiegreffe et al., 2022), and program synthesis/execution (Nye et al., 2021). It distinguishes itself by using natural language reasoning steps instead of formal languages or task-specific finetuning, and by focusing on prompting rather than architectural changes.",
+  "sections_summary": [
+    {
+      "section": "1 Introduction",
+      "summary": "Introduces the limitations of scaling LLMs for reasoning and proposes CoT prompting as a solution."
+    },
+    {
+      "section": "2 Chain-of-Thought Prompting",
+      "summary": "Defines CoT prompting and its benefits, such as decomposability and interpretability."
+    },
+    {
+      "section": "3 Arithmetic Reasoning",
+      "summary": "Details experiments on math word problems, showing CoT's effectiveness and robustness."
+    },
+    {
+      "section": "4 Commonsense Reasoning",
+      "summary": "Extends CoT to commonsense tasks, showing improvements across various benchmarks."
+    },
+    {
+      "section": "5 Symbolic Reasoning",
+      "summary": "Demonstrates CoT's ability to facilitate length generalization in symbolic tasks."
+    },
+    {
+      "section": "6 Discussion",
+      "summary": "Summarizes findings, limitations, and future research directions."
+    }
+  ],
+  "figures_and_tables": [
+    {
+      "id": "Figure 1",
+      "what_it_shows": "Comparison of standard vs. CoT prompting.",
+      "key_numbers": "N/A"
+    },
+    {
+      "id": "Table 1",
+      "what_it_shows": "Performance on arithmetic benchmarks with and without external calculator.",
+      "key_numbers": "PaLM 540B GSM8K: 56.9% (CoT) vs 58.6% (+ext. calc)"
+    }
+  ],
+  "references_cited": [
+    {
+      "authors_short": "Brown et al.",
+      "title": "Language models are few-shot learners",
+      "year": 2020
+    },
+    {
+      "authors_short": "Cobbe et al.",
+      "title": "Training verifiers to solve math word problems",
+      "year": 2021
+    },
+    {
+      "authors_short": "Ling et al.",
+      "title": "Program induction by rationale generation",
+      "year": 2017
+    },
+    {
+      "authors_short": "Nye et al.",
+      "title": "Show your work: Scratchpads for intermediate computation",
+      "year": 2021
+    },
+    {
+      "authors_short": "Rae et al.",
+      "title": "Scaling language models: Methods, analysis & insights",
+      "year": 2021
+    },
+    {
+      "authors_short": "Wei et al.",
+      "title": "Emergent abilities of large language models",
+      "year": 2022
+    },
+    {
+      "authors_short": "Talmor et al.",
+      "title": "CommonsenseQA",
+      "year": 2019
+    },
+    {
+      "authors_short": "Patel et al.",
+      "title": "Are NLP models really able to solve simple math word problems?",
+      "year": 2021
+    },
+    {
+      "authors_short": "Miao et al.",
+      "title": "A diverse corpus for evaluating math word problem solvers",
+      "year": 2020
+    },
+    {
+      "authors_short": "Koncel-Kedziorski et al.",
+      "title": "MAWPS: A math word problem repository",
+      "year": 2016
+    },
+    {
+      "authors_short": "Thoppilan et al.",
+      "title": "LaMDA: Language models for dialog applications",
+      "year": 2022
+    },
+    {
+      "authors_short": "Chen et al.",
+      "title": "Evaluating large language models trained on code",
+      "year": 2021
+    },
+    {
+      "authors_short": "Tay et al.",
+      "title": "Unifying language learning paradigms",
+      "year": 2022
+    },
+    {
+      "authors_short": "Wang et al.",
+      "title": "Self-consistency improves chain of thought reasoning",
+      "year": 2022
+    },
+    {
+      "authors_short": "Zelikman et al.",
+      "title": "STaR: Bootstrapping reasoning with reasoning",
+      "year": 2022
+    }
+  ],
+  "reproducibility": "The authors provide input prompts in the appendix, use publicly available APIs for GPT-3, and provide LaMDA 137B inputs/outputs in the supplementary material.",
+  "source_file": "2201.11903v6.pdf",
+  "cite_key": "[Wei et al., 2022]"
+}

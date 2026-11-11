@@ -1,0 +1,306 @@
+{
+  "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
+  "authors": [
+    "Timo Schick",
+    "Jane Dwivedi-Yu",
+    "Roberto Dessì",
+    "Roberta Raileanu",
+    "Maria Lomeli",
+    "Luke Zettlemoyer",
+    "Nicola Cancedda",
+    "Thomas Scialom"
+  ],
+  "year": 2023,
+  "venue": "arXiv",
+  "arxiv_id": "2302.04761",
+  "abstract_summary": "Large language models (LMs) often struggle with basic tasks like arithmetic or factual lookup despite their scale. The authors introduce Toolformer, a model trained to autonomously decide which APIs to call, when to call them, and how to incorporate the results into future token predictions. This training is done in a self-supervised manner using only a handful of demonstrations for each API. Toolformer integrates tools like a calculator, Q&A system, search engine, translation system, and a calendar. Experiments show that Toolformer achieves improved zero-shot performance across various downstream tasks, often competing with much larger models. Crucially, this is achieved without sacrificing the model's core language modeling abilities.",
+  "problem_and_motivation": "Large language models (LMs) demonstrate impressive zero-shot and few-shot capabilities but suffer from inherent limitations: inability to access up-to-date information, tendency to hallucinate facts, poor performance on low-resource languages, lack of mathematical precision, and lack of temporal awareness. While giving LMs access to external tools (search engines, calculators, etc.) is a known solution, existing approaches either require massive amounts of human annotation or are restricted to task-specific settings. The authors aim to enable LMs to learn tool use in a self-supervised way, without large-scale human supervision, and to decide independently when and how to use tools to maintain general-purpose utility.",
+  "contributions": [
+    "Introduction of Toolformer, a model that learns to use tools in a self-supervised way.",
+    "A method for augmenting language modeling datasets with API calls using only a few human-written examples.",
+    "A self-supervised filtering mechanism to determine which API calls are useful for reducing model perplexity.",
+    "Demonstration that Toolformer achieves strong zero-shot performance on various benchmarks, outperforming larger models like GPT-3 and OPT.",
+    "Empirical validation that tool use does not degrade the model's core language modeling capabilities."
+  ],
+  "method": {
+    "overview": "Toolformer is trained by augmenting a large language modeling dataset with potential API calls. The process involves three main steps: sampling potential API calls using the model's in-context learning, executing these calls, and filtering them based on whether they reduce the model's cross-entropy loss on future tokens. The model is then finetuned on the augmented dataset.",
+    "components": [
+      {
+        "name": "Sampling API Calls",
+        "description": "For each API, a prompt is written to encourage the model to annotate text with API calls. The model computes the probability of starting an API call at each position in the text. Positions with a probability above a threshold are selected, and the model samples up to m API calls for each.",
+        "equations_or_algorithms": "pi = pM(<API> | P(x), x1:i-1)"
+      },
+      {
+        "name": "Executing API Calls",
+        "description": "The generated API calls are executed to obtain results. The execution method depends on the tool (e.g., calling a Python script for a calculator, a retrieval system for search, or another neural network for translation). The result must be a single text sequence.",
+        "equations_or_algorithms": null
+      },
+      {
+        "name": "Filtering API Calls",
+        "description": "The model evaluates if an API call is helpful by comparing the weighted cross-entropy loss on future tokens with and without the API call. An API call is kept only if the loss is reduced by at least a threshold tau_f.",
+        "equations_or_algorithms": "Li(z) = - sum_{j=i}^n w_{j-i} * log pM(xj | z, x1:j-1); L+i = Li(e(ci, ri)); L-i = min(Li(eps), Li(e(ci, eps))); L-i - L+i >= tau_f"
+      },
+      {
+        "name": "Model Finetuning",
+        "description": "The filtered API calls are interleaved with the original text to create an augmented dataset. The model is then finetuned on this augmented dataset using a standard language modeling objective.",
+        "equations_or_algorithms": null
+      }
+    ],
+    "settings": "Model: GPT-J (6.7B parameters). Finetuning: batch size 128, learning rate 1e-5, linear warmup for 10% of training. Tools: Calculator (basic arithmetic), Q&A (Atlas), Wikipedia Search (BM25), Machine Translation (NLLB 600M), Calendar (current date)."
+  },
+  "experiments": {
+    "tasks_and_datasets": [
+      {
+        "name": "LAMA",
+        "description": "Fact completion tasks (SQuAD, Google-RE, T-REx).",
+        "metric": "Accuracy (lenient: correct word in top 5 predictions)"
+      },
+      {
+        "name": "Math Benchmarks",
+        "description": "Mathematical reasoning (ASDiv, SVAMP, MAWPS).",
+        "metric": "Accuracy (first number predicted)"
+      },
+      {
+        "name": "Question Answering",
+        "description": "WebQuestions, Natural Questions, TriviaQA.",
+        "metric": "Accuracy (first 20 words contain answer)"
+      },
+      {
+        "name": "Multilingual QA",
+        "description": "MLQA (Arabic, German, Spanish, Hindi, Vietnamese, Chinese).",
+        "metric": "Accuracy (first 10 words contain answer)"
+      },
+      {
+        "name": "Temporal Datasets",
+        "description": "TEMPLAMA and DATESET (fact queries requiring temporal context).",
+        "metric": "Accuracy"
+      }
+    ],
+    "baselines": [
+      "GPT-J (base)",
+      "GPT-J + CC (finetuned on CCNet)",
+      "Toolformer (disabled)",
+      "OPT (66B)",
+      "GPT-3 (175B)"
+    ],
+    "setup_details": "Prompted zero-shot setup for all tasks. Standard greedy decoding used, with the modification that the model can start an API call if <API> is one of the top k=10 most likely tokens."
+  },
+  "results": [
+    {
+      "experiment": "LAMA",
+      "comparison": "Toolformer vs GPT-J, OPT (66B), GPT-3 (175B)",
+      "numbers": "SQuAD: 33.8 (Toolformer) vs 17.8 (GPT-J), 21.6 (OPT), 26.8 (GPT-3). Google-RE: 11.5 (Toolformer) vs 4.9 (GPT-J), 2.9 (OPT), 7.0 (GPT-3). T-REx: 53.5 (Toolformer) vs 31.9 (GPT-J), 30.1 (OPT), 39.8 (GPT-3).",
+      "model_size": "6.7B (Toolformer)",
+      "setting": "zero-shot",
+      "where": "Table 3, page 6",
+      "takeaway": "Toolformer significantly outperforms all baselines of the same size and achieves results competitive with or better than much larger models."
+    },
+    {
+      "experiment": "Math Benchmarks",
+      "comparison": "Toolformer vs GPT-J, OPT (66B), GPT-3 (175B)",
+      "numbers": "ASDiv: 40.4 (Toolformer) vs 7.5 (GPT-J), 6.0 (OPT), 14.0 (GPT-3). SVAMP: 29.4 (Toolformer) vs 5.2 (GPT-J), 4.9 (OPT), 10.0 (GPT-3). MAWPS: 44.0 (Toolformer) vs 9.9 (GPT-J), 7.9 (OPT), 19.8 (GPT-3).",
+      "model_size": "6.7B (Toolformer)",
+      "setting": "zero-shot",
+      "where": "Table 4, page 6",
+      "takeaway": "Toolformer vastly outperforms all baselines, demonstrating the effectiveness of the calculator tool."
+    }
+  ],
+  "claims_table": [
+    {
+      "claim": "Toolformer outperforms GPT-3 (175B) on LAMA benchmarks.",
+      "metric": "Accuracy",
+      "value": "53.5 vs 39.8 (T-REx)",
+      "benchmark": "LAMA (T-REx)",
+      "model_size": "6.7B",
+      "setting": "zero-shot",
+      "where": "Table 3, page 6"
+    },
+    {
+      "claim": "Toolformer outperforms GPT-3 (175B) on math benchmarks.",
+      "metric": "Accuracy",
+      "value": "44.0 vs 19.8 (MAWPS)",
+      "benchmark": "MAWPS",
+      "model_size": "6.7B",
+      "setting": "zero-shot",
+      "where": "Table 4, page 6"
+    }
+  ],
+  "ablations_and_analysis": [
+    {
+      "what_varied": "Decoding parameter k (number of top tokens considered for API call)",
+      "finding": "Increasing k increases the frequency of API calls. For k=1 (greedy), Toolformer is well-calibrated, choosing to call APIs for examples where it would otherwise perform poorly.",
+      "numbers": "T-REx performance: 34.9 (k=0) to 53.5 (k=10). WebQS performance: 18.9 (k=0) to 26.3 (k=10)."
+    },
+    {
+      "what_varied": "Model size (GPT-2 family: 124M, 355M, 775M, 1.6B)",
+      "finding": "Ability to leverage tools emerges around 775M parameters. Smaller models show little difference with or without tools.",
+      "numbers": "Figure 4, page 9"
+    }
+  ],
+  "limitations": [
+    "Inability to use tools in a chain (output of one tool as input to another).",
+    "Lack of interactive tool use (e.g., browsing search results or refining queries).",
+    "Sensitivity to exact input wording when deciding whether to call an API.",
+    "Sample-inefficiency (requires processing millions of documents to get a few thousand useful calls for some tools).",
+    "Does not account for the computational cost of making an API call."
+  ],
+  "failure_modes": [
+    "Model occasionally makes API calls that do not provide useful information.",
+    "Model may get stuck in a loop if not limited to one API call per input.",
+    "Performance on some tasks (e.g., WebQS) still falls short of much larger models like GPT-3."
+  ],
+  "future_work": [
+    "Enabling chained tool use.",
+    "Enabling interactive tool use (e.g., browsing search results).",
+    "Iteratively applying the approach to improve sample efficiency.",
+    "Incorporating the computational cost of API calls into the decision-making process."
+  ],
+  "key_claims": [
+    {
+      "claim": "LMs can teach themselves to use external tools via simple APIs in a self-supervised way.",
+      "where": "Abstract, page 1"
+    },
+    {
+      "claim": "Toolformer achieves improved zero-shot performance without sacrificing core language modeling abilities.",
+      "where": "Abstract, page 1"
+    }
+  ],
+  "definitions_and_terms": [
+    {
+      "term": "Toolformer",
+      "meaning": "A language model trained to autonomously decide which APIs to call, when to call them, and how to incorporate the results."
+    },
+    {
+      "term": "Self-supervised filtering",
+      "meaning": "A method to determine if an API call is useful by checking if it reduces the model's cross-entropy loss on future tokens."
+    }
+  ],
+  "related_work_positioning": "The authors position Toolformer against existing tool-use approaches which either rely on large amounts of human supervision (e.g., Komeili et al., 2022; Nakano et al., 2021; Thoppilan et al., 2022) or are limited to task-specific few-shot prompting (e.g., Gao et al., 2022; Lazaridou et al., 2022). They highlight that Toolformer is most closely related to TALM (Parisi et al., 2022), which also uses a self-supervised objective but only in settings where the model is finetuned for specific downstream tasks.",
+  "sections_summary": [
+    {
+      "section": "1 Introduction",
+      "summary": "Introduces the limitations of current LMs (factual inaccuracy, lack of math/temporal skills) and proposes Toolformer as a self-supervised solution to enable tool use."
+    },
+    {
+      "section": "2 Approach",
+      "summary": "Details the methodology: sampling API calls via in-context learning, executing them, filtering based on perplexity reduction, and finetuning the model on the augmented dataset."
+    },
+    {
+      "section": "3 Tools",
+      "summary": "Describes the five tools used: Question Answering (Atlas), Calculator, Wikipedia Search (BM25), Machine Translation (NLLB), and a Calendar API."
+    },
+    {
+      "section": "4 Experiments",
+      "summary": "Evaluates Toolformer on LAMA, math benchmarks, QA, multilingual QA, and temporal datasets, showing it outperforms baselines and competes with much larger models."
+    },
+    {
+      "section": "5 Analysis",
+      "summary": "Analyzes the decoding strategy (parameter k), data quality, and scaling laws, showing that tool-use ability emerges at larger model sizes."
+    },
+    {
+      "section": "6 Related Work",
+      "summary": "Positions Toolformer within the literature on language model pretraining, tool use, and bootstrapping/self-training techniques."
+    },
+    {
+      "section": "7 Limitations",
+      "summary": "Discusses limitations: no chained tool use, no interactive tool use, sensitivity to input wording, sample inefficiency, and lack of computational cost awareness."
+    }
+  ],
+  "figures_and_tables": [
+    {
+      "id": "Figure 1",
+      "what_it_shows": "Exemplary predictions of Toolformer using different APIs.",
+      "key_numbers": null
+    },
+    {
+      "id": "Table 3",
+      "what_it_shows": "Results on LAMA benchmarks.",
+      "key_numbers": "Toolformer: 33.8 (SQuAD), 11.5 (Google-RE), 53.5 (T-REx)"
+    },
+    {
+      "id": "Table 4",
+      "what_it_shows": "Results on math benchmarks.",
+      "key_numbers": "Toolformer: 40.4 (ASDiv), 29.4 (SVAMP), 44.0 (MAWPS)"
+    }
+  ],
+  "references_cited": [
+    {
+      "authors_short": "Brown et al.",
+      "title": "Language models are few-shot learners",
+      "year": 2020
+    },
+    {
+      "authors_short": "Schick and Schütze",
+      "title": "Generating datasets with pretrained language models",
+      "year": 2021
+    },
+    {
+      "authors_short": "Izacard et al.",
+      "title": "Atlas: Few-shot learning with retrieval augmented language models",
+      "year": 2022
+    },
+    {
+      "authors_short": "Parisi et al.",
+      "title": "Talm: Tool augmented language models",
+      "year": 2022
+    },
+    {
+      "authors_short": "Petroni et al.",
+      "title": "Language models as knowledge bases?",
+      "year": 2019
+    },
+    {
+      "authors_short": "Wang and Komatsuzaki",
+      "title": "GPT-J-6B: A 6 Billion Parameter Autoregressive Language Model",
+      "year": 2021
+    },
+    {
+      "authors_short": "Zhang et al.",
+      "title": "Opt: Open pre-trained transformer language models",
+      "year": 2022
+    },
+    {
+      "authors_short": "Dhingra et al.",
+      "title": "Time-aware language models as temporal knowledge bases",
+      "year": 2022
+    },
+    {
+      "authors_short": "Costa-jussà et al.",
+      "title": "No language left behind: Scaling human-centered machine translation",
+      "year": 2022
+    },
+    {
+      "authors_short": "Wenzek et al.",
+      "title": "CCNet: Extracting high quality monolingual datasets from web crawl data",
+      "year": 2020
+    },
+    {
+      "authors_short": "Nakano et al.",
+      "title": "Webgpt: Browser-assisted question-answering with human feedback",
+      "year": 2021
+    },
+    {
+      "authors_short": "Yao et al.",
+      "title": "React: Synergizing reasoning and acting in language models",
+      "year": 2022
+    },
+    {
+      "authors_short": "Zelikman et al.",
+      "title": "Star: Bootstrapping reasoning with reasoning",
+      "year": 2022
+    },
+    {
+      "authors_short": "Komeili et al.",
+      "title": "Internet-augmented dialogue generation",
+      "year": 2022
+    },
+    {
+      "authors_short": "Thoppilan et al.",
+      "title": "Lamda: Language models for dialog applications",
+      "year": 2022
+    }
+  ],
+  "reproducibility": "The authors provide details on the training procedure (DeepSpeed ZeRO-3, 8x A100 GPUs, 2k steps, batch size 128) and the prompts used for each tool in the appendix. The model is based on GPT-J (6.7B), and the dataset is a subset of CCNet.",
+  "source_file": "2302.04761v1.pdf",
+  "cite_key": "[Schick et al., 2023]"
+}

@@ -1,3 +1,7 @@
+"""Listeaza modelele disponibile pentru cheia ta si testeaza care raspund.
+Rulare: python list_models.py          (doar lista)
+        python list_models.py --test   (incearca un apel mic pe fiecare model flash)
+"""
 import sys
 
 from google import genai

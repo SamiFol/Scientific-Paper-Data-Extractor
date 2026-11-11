@@ -1,0 +1,330 @@
+{
+  "title": "Attention Is All You Need",
+  "authors": [
+    "Ashish Vaswani",
+    "Noam Shazeer",
+    "Niki Parmar",
+    "Jakob Uszkoreit",
+    "Llion Jones",
+    "Aidan N. Gomez",
+    "Łukasz Kaiser",
+    "Illia Polosukhin"
+  ],
+  "year": 2017,
+  "venue": "31st Conference on Neural Information Processing Systems (NIPS 2017)",
+  "arxiv_id": "1706.03762v7",
+  "abstract_summary": "The paper introduces the Transformer, a novel sequence transduction model architecture that relies entirely on attention mechanisms, eliminating the need for recurrence or convolutions. By eschewing sequential computation, the model allows for significantly higher parallelization during training. Experiments on WMT 2014 English-to-German and English-to-French machine translation tasks demonstrate superior quality and reduced training time compared to existing state-of-the-art models. The Transformer achieves a new state-of-the-art BLEU score of 28.4 on English-to-German and 41.8 on English-to-French. Furthermore, the model generalizes well to other tasks, such as English constituency parsing, even with limited training data. The architecture is shown to be highly efficient, requiring only a fraction of the training costs of previous best models.",
+  "problem_and_motivation": "The primary problem addressed is the inherent sequential nature of traditional recurrent neural networks (RNNs) and convolutional neural networks (CNNs) in sequence transduction tasks. RNNs process data symbol-by-symbol, creating a dependency on previous hidden states that precludes parallelization within training examples, which becomes a bottleneck for long sequences. While CNNs allow for parallelization, the number of operations required to relate signals from distant positions grows with distance, making it difficult to learn long-range dependencies. The motivation is to create a model that can handle global dependencies between input and output positions with constant-time complexity and maximum parallelization, thereby significantly reducing training time while improving translation quality.",
+  "contributions": [
+    "Introduction of the Transformer, the first sequence transduction model relying entirely on self-attention.",
+    "Elimination of recurrence and convolution, allowing for massive parallelization.",
+    "Achievement of new state-of-the-art BLEU scores on WMT 2014 English-to-German (28.4) and English-to-French (41.8) translation tasks.",
+    "Demonstration of significant training efficiency, requiring only a fraction of the compute of previous models.",
+    "Successful generalization of the architecture to English constituency parsing.",
+    "Introduction of Multi-Head Attention to allow the model to jointly attend to information from different representation subspaces."
+  ],
+  "method": {
+    "overview": "The Transformer follows an encoder-decoder architecture. The encoder is a stack of 6 identical layers, each containing a multi-head self-attention sub-layer and a position-wise fully connected feed-forward network, with residual connections and layer normalization around each sub-layer. The decoder also consists of a stack of 6 identical layers, adding a third sub-layer that performs multi-head attention over the encoder's output. The decoder's self-attention is masked to prevent positions from attending to subsequent positions, preserving the auto-regressive property. Positional encodings are added to input embeddings to provide information about the order of tokens, as the model lacks inherent recurrence or convolution.",
+    "components": [
+      {
+        "name": "Scaled Dot-Product Attention",
+        "description": "The core attention mechanism where the input consists of queries and keys of dimension dk and values of dimension dv. The dot products of the query with all keys are computed, divided by the square root of dk, and passed through a softmax function to obtain weights on the values. Scaling by the square root of dk is crucial to prevent the dot products from growing too large in magnitude, which would push the softmax function into regions with extremely small gradients.",
+        "equations_or_algorithms": "Attention(Q, K, V) = softmax(QKT / sqrt(dk))V"
+      },
+      {
+        "name": "Multi-Head Attention",
+        "description": "Instead of a single attention function, the model linearly projects queries, keys, and values h times with different, learned linear projections to dk, dk, and dv dimensions, respectively. The attention function is performed in parallel on each of these projected versions, yielding dv-dimensional output values. These outputs are then concatenated and once again projected to produce the final values. This allows the model to jointly attend to information from different representation subspaces at different positions.",
+        "equations_or_algorithms": "MultiHead(Q, K, V) = Concat(head1, ..., headh)WO; headi = Attention(QWQi, KWKi, VWVi)"
+      },
+      {
+        "name": "Position-wise Feed-Forward Networks",
+        "description": "Each layer in the encoder and decoder contains a fully connected feed-forward network applied to each position separately and identically. It consists of two linear transformations with a ReLU activation in between. This is equivalent to two convolutions with kernel size 1.",
+        "equations_or_algorithms": "FFN(x) = max(0, xW1 + b1)W2 + b2"
+      },
+      {
+        "name": "Positional Encoding",
+        "description": "Since the model has no recurrence or convolution, positional information is injected by adding sine and cosine functions of different frequencies to the input embeddings. This allows the model to easily learn to attend by relative positions, as for any fixed offset k, PE(pos+k) can be represented as a linear function of PE(pos).",
+        "equations_or_algorithms": "PE(pos, 2i) = sin(pos / 10000^(2i/dmodel)); PE(pos, 2i+1) = cos(pos / 10000^(2i/dmodel))"
+      }
+    ],
+    "settings": "The base model uses dmodel=512, dff=2048, h=8, dk=dv=64, N=6. The big model uses dmodel=1024, dff=4096, h=16. Training used 8 NVIDIA P100 GPUs, Adam optimizer with beta1=0.9, beta2=0.98, epsilon=10^-9, and a custom learning rate schedule with 4000 warmup steps. Regularization included residual dropout (Pdrop=0.1 for base, 0.3 for big) and label smoothing (epsilon_ls=0.1)."
+  },
+  "experiments": {
+    "tasks_and_datasets": [
+      {
+        "name": "WMT 2014 English-to-German",
+        "description": "Translation task with 4.5 million sentence pairs, byte-pair encoded with ~37k vocabulary.",
+        "metric": "BLEU"
+      },
+      {
+        "name": "WMT 2014 English-to-French",
+        "description": "Translation task with 36 million sentence pairs, word-piece encoded with 32k vocabulary.",
+        "metric": "BLEU"
+      },
+      {
+        "name": "English Constituency Parsing",
+        "description": "Parsing task using the Wall Street Journal (WSJ) portion of the Penn Treebank (40k sentences) and a semi-supervised setting with 17M sentences.",
+        "metric": "F1 score"
+      }
+    ],
+    "baselines": [
+      "ByteNet",
+      "Deep-Att + PosUnk",
+      "GNMT + RL",
+      "ConvS2S",
+      "MoE",
+      "BerkeleyParser"
+    ],
+    "setup_details": "Base models trained for 100,000 steps (12 hours). Big models trained for 300,000 steps (3.5 days). Beam search with beam size 4 and length penalty alpha=0.6 used for translation. For parsing, beam size 21 and alpha=0.3 used."
+  },
+  "results": [
+    {
+      "experiment": "WMT 2014 English-to-German",
+      "comparison": "Transformer (big) vs. best previously reported models (including ensembles)",
+      "numbers": "28.4 BLEU",
+      "model_size": "Transformer (big)",
+      "setting": "beam search, checkpoint averaging",
+      "where": "Table 2, page 8",
+      "takeaway": "Establishes a new state-of-the-art, outperforming previous best models by over 2 BLEU."
+    },
+    {
+      "experiment": "WMT 2014 English-to-French",
+      "comparison": "Transformer (big) vs. best previously reported single models",
+      "numbers": "41.8 BLEU",
+      "model_size": "Transformer (big)",
+      "setting": "beam search, checkpoint averaging",
+      "where": "Table 2, page 8",
+      "takeaway": "Establishes a new single-model state-of-the-art."
+    },
+    {
+      "experiment": "English Constituency Parsing",
+      "comparison": "Transformer (4 layers) vs. various parsers",
+      "numbers": "91.3 F1 (WSJ only), 92.7 F1 (semi-supervised)",
+      "model_size": "4 layers, dmodel=1024",
+      "setting": "beam search",
+      "where": "Table 4, page 10",
+      "takeaway": "Outperforms all previously reported models except the Recurrent Neural Network Grammar."
+    }
+  ],
+  "claims_table": [
+    {
+      "claim": "Transformer (big) achieves new state-of-the-art on EN-DE",
+      "metric": "BLEU",
+      "value": "28.4",
+      "benchmark": "WMT 2014 English-to-German",
+      "model_size": "Transformer (big)",
+      "setting": "beam search",
+      "where": "Table 2, page 8"
+    },
+    {
+      "claim": "Transformer (big) achieves new single-model state-of-the-art on EN-FR",
+      "metric": "BLEU",
+      "value": "41.8",
+      "benchmark": "WMT 2014 English-to-French",
+      "model_size": "Transformer (big)",
+      "setting": "beam search",
+      "where": "Table 2, page 8"
+    }
+  ],
+  "ablations_and_analysis": [
+    {
+      "what_varied": "Number of attention heads and key/value dimensions",
+      "finding": "Single-head attention is 0.9 BLEU worse than the best setting; quality drops off with too many heads.",
+      "numbers": "Table 3, rows (A)"
+    },
+    {
+      "what_varied": "Attention key size (dk)",
+      "finding": "Reducing dk hurts model quality, suggesting a more sophisticated compatibility function than dot product might be beneficial.",
+      "numbers": "Table 3, rows (B)"
+    },
+    {
+      "what_varied": "Positional encoding method",
+      "finding": "Replacing sinusoidal positional encoding with learned positional embeddings produces nearly identical results.",
+      "numbers": "Table 3, row (E)"
+    }
+  ],
+  "limitations": [
+    "Reduced effective resolution due to averaging attention-weighted positions.",
+    "Computational complexity of O(n^2 * d) for self-attention, which can be problematic for very long sequences.",
+    "The need for task-specific tuning of hyperparameters like dropout, learning rates, and beam size."
+  ],
+  "failure_modes": [
+    "None explicitly listed as failure modes, but the paper notes that reducing attention key size (dk) hurts quality."
+  ],
+  "future_work": [
+    "Applying the Transformer to input and output modalities other than text (e.g., images, audio, video).",
+    "Investigating local, restricted attention mechanisms to efficiently handle large inputs and outputs.",
+    "Making generation less sequential."
+  ],
+  "key_claims": [
+    {
+      "claim": "The Transformer is the first sequence transduction model relying entirely on self-attention.",
+      "where": "Introduction, page 2"
+    },
+    {
+      "claim": "The Transformer allows for significantly more parallelization than recurrent models.",
+      "where": "Introduction, page 2"
+    },
+    {
+      "claim": "Self-attention layers are faster than recurrent layers when the sequence length n is smaller than the representation dimensionality d.",
+      "where": "Section 4, page 6"
+    }
+  ],
+  "definitions_and_terms": [
+    {
+      "term": "Self-attention",
+      "meaning": "An attention mechanism relating different positions of a single sequence in order to compute a representation of the sequence."
+    },
+    {
+      "term": "Multi-Head Attention",
+      "meaning": "A mechanism that projects queries, keys, and values into multiple representation subspaces and performs attention in parallel."
+    },
+    {
+      "term": "Positional Encoding",
+      "meaning": "A method to inject information about the relative or absolute position of tokens in a sequence, used because the model lacks recurrence."
+    }
+  ],
+  "related_work_positioning": "The paper positions the Transformer as an alternative to recurrent (e.g., LSTM [13], GRU [7]) and convolutional (e.g., ByteNet [18], ConvS2S [9]) sequence transduction models. It highlights that while attention is often used in conjunction with RNNs (e.g., [2, 19]), the Transformer is the first to rely entirely on self-attention. It compares its computational complexity and path length favorably against these prior architectures.",
+  "sections_summary": [
+    {
+      "section": "1 Introduction",
+      "summary": "Discusses the limitations of recurrent and convolutional models in sequence transduction, specifically their sequential nature and difficulty in learning long-range dependencies. Introduces the Transformer as a parallelizable, attention-based alternative."
+    },
+    {
+      "section": "2 Background",
+      "summary": "Reviews existing work on reducing sequential computation (ByteNet, ConvS2S) and the use of self-attention in various tasks. Positions the Transformer as the first model to rely entirely on self-attention."
+    },
+    {
+      "section": "3 Model Architecture",
+      "summary": "Describes the encoder-decoder structure of the Transformer, including stacked self-attention, multi-head attention, position-wise feed-forward networks, and positional encodings."
+    },
+    {
+      "section": "4 Why Self-Attention",
+      "summary": "Compares self-attention to recurrent and convolutional layers based on computational complexity per layer, parallelizability, and path length for long-range dependencies."
+    },
+    {
+      "section": "5 Training",
+      "summary": "Details the training regime, including datasets (WMT 2014), hardware (8 P100 GPUs), optimizer (Adam with custom learning rate schedule), and regularization (dropout, label smoothing)."
+    },
+    {
+      "section": "6 Results",
+      "summary": "Presents experimental results on machine translation and constituency parsing, showing state-of-the-art performance and efficiency, and discusses model variations."
+    },
+    {
+      "section": "7 Conclusion",
+      "summary": "Summarizes the contributions, highlights the success of the Transformer, and outlines future research directions."
+    }
+  ],
+  "figures_and_tables": [
+    {
+      "id": "Figure 1",
+      "what_it_shows": "The Transformer model architecture.",
+      "key_numbers": "N=6 layers"
+    },
+    {
+      "id": "Figure 2",
+      "what_it_shows": "Scaled Dot-Product Attention and Multi-Head Attention.",
+      "key_numbers": "h=8 heads"
+    },
+    {
+      "id": "Table 1",
+      "what_it_shows": "Comparison of layer types (Self-Attention, Recurrent, Convolutional) on complexity, sequential operations, and path length.",
+      "key_numbers": "Self-Attention: O(n^2 * d) complexity, O(1) sequential ops, O(1) path length"
+    },
+    {
+      "id": "Table 2",
+      "what_it_shows": "BLEU scores and training costs for machine translation.",
+      "key_numbers": "Transformer (big) EN-DE: 28.4 BLEU; EN-FR: 41.8 BLEU"
+    },
+    {
+      "id": "Table 3",
+      "what_it_shows": "Ablation studies on the Transformer architecture.",
+      "key_numbers": "Base model: 25.8 BLEU; Big model: 26.4 BLEU"
+    },
+    {
+      "id": "Table 4",
+      "what_it_shows": "Results on English constituency parsing.",
+      "key_numbers": "Transformer (4 layers) WSJ only: 91.3 F1; semi-supervised: 92.7 F1"
+    }
+  ],
+  "references_cited": [
+    {
+      "authors_short": "Ba et al.",
+      "title": "Layer normalization",
+      "year": 2016
+    },
+    {
+      "authors_short": "Bahdanau et al.",
+      "title": "Neural machine translation by jointly learning to align and translate",
+      "year": 2014
+    },
+    {
+      "authors_short": "Britz et al.",
+      "title": "Massive exploration of neural machine translation architectures",
+      "year": 2017
+    },
+    {
+      "authors_short": "Cheng et al.",
+      "title": "Long short-term memory-networks for machine reading",
+      "year": 2016
+    },
+    {
+      "authors_short": "Cho et al.",
+      "title": "Learning phrase representations using rnn encoder-decoder for statistical machine translation",
+      "year": 2014
+    },
+    {
+      "authors_short": "Chollet",
+      "title": "Xception: Deep learning with depthwise separable convolutions",
+      "year": 2016
+    },
+    {
+      "authors_short": "Chung et al.",
+      "title": "Empirical evaluation of gated recurrent neural networks on sequence modeling",
+      "year": 2014
+    },
+    {
+      "authors_short": "Dyer et al.",
+      "title": "Recurrent neural network grammars",
+      "year": 2016
+    },
+    {
+      "authors_short": "Gehring et al.",
+      "title": "Convolutional sequence to sequence learning",
+      "year": 2017
+    },
+    {
+      "authors_short": "Graves",
+      "title": "Generating sequences with recurrent neural networks",
+      "year": 2013
+    },
+    {
+      "authors_short": "He et al.",
+      "title": "Deep residual learning for image recognition",
+      "year": 2016
+    },
+    {
+      "authors_short": "Hochreiter & Schmidhuber",
+      "title": "Long short-term memory",
+      "year": 1997
+    },
+    {
+      "authors_short": "Kaiser & Bengio",
+      "title": "Can active memory replace attention?",
+      "year": 2016
+    },
+    {
+      "authors_short": "Kalchbrenner et al.",
+      "title": "Neural machine translation in linear time",
+      "year": 2017
+    },
+    {
+      "authors_short": "Kingma & Ba",
+      "title": "Adam: A method for stochastic optimization",
+      "year": 2015
+    }
+  ],
+  "reproducibility": "The authors provide the code used to train and evaluate the models at https://github.com/tensorflow/tensor2tensor.",
+  "source_file": "1706.03762v7.pdf",
+  "cite_key": "[Vaswani et al., 2017]"
+}
