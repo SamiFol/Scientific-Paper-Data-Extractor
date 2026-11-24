@@ -27,7 +27,9 @@ task_write = Task(
         "Using the detailed outline, write a complete, formal academic paper. "
         "Output ONLY compilable LaTeX code (using standard article class or IEEEtran). "
         "Do NOT wrap the LaTeX in Markdown code fences. "
-        "Start directly with the LaTeX documentclass declaration and end with the closing LaTeX document command."
+        "Start directly with the LaTeX documentclass declaration and end with the closing LaTeX document command. "
+        "CRITICAL: Keep the paper concise (aim for a standard 4-6 page conference paper). "
+        "You MUST include the standard LaTeX end document command at the very end of your output."
     ),
     expected_output="Complete compilable LaTeX source code for the new paper.",
     agent=writer,

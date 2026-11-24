@@ -53,3 +53,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
